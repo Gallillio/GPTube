@@ -147,7 +147,7 @@ function App() {
           <div className='inputText'>
             <input type='text' name='' id='' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
             {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
-            {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded'> mic </button> : <button onClick={stopListening} className='send material-symbols-rounded'> mic </button>}
+            {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded'> mic </button> : <button onClick={stopListening} className='send material-symbols-rounded stop'> stop </button>}
             <button className='send' onClick={handleSend}> <img src={sendButton} alt='Send Button' /> </button>
           </div>
         </div>

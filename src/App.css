@@ -188,3 +188,6 @@ body{
 .blur-background{
     backdrop-filter: blur(10px);
   }
+.stop{
+   font-size:35px ; 
+}
