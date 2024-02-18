@@ -7,20 +7,18 @@ import { AzureKeyCredential } from "@azure/openai";
 export async function sendMessageToOpenAI(message) {
 
     const client = new OpenAIClient(
-        "https://eslsca-openai.openai.azure.com/openai/deployments/EsQuA/chat/completions?api-version=2023-07-01-preview",
+        "https://eslsca-openai.openai.azure.com",
         new AzureKeyCredential("0d368117945a4cb8a0f5b282dd192340")
     );
 
-    message = [
-        { 'role': 'user', 'content': message }
-    ]
-
-    const response = await client.getCompletions(
+    const response = await client.getChatCompletions(
         "EsQuA",
         [{ 'role': 'user', 'content': message }],
     );
-    console.log(response)
-    return response.choices[0].text
+
+    //this is the messsage on its own, remove .message.content to get the  { 'role': 'user', 'content': message }
+    console.log(response.choices[0].message.content)
+    return response.choices[0].message.content
 }
 
 // const openai = new OpenAI({
