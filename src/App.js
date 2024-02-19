@@ -161,7 +161,7 @@ function App() {
       </div>
 
       <div className='main'>
-      <div className="video-div">{ <iframe class="video-window" src="https://www.youtube.com/embed/wK0N1Bq3948?rel=0"></iframe> }</div>
+        <div className="video-div">{<iframe class="video-window" src="https://www.youtube.com/embed/wK0N1Bq3948?rel=0"></iframe>}</div>
 
         <div className='chats'>
           {messages.map((message, i) => {
