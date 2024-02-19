@@ -9,8 +9,8 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
 
-const SPEECH_KEY = 'b0f5184c6c2242f78356246fb06082f9';
-const SPEECH_REGION = 'eastus';
+const speechKey = process.env.REACT_APP_SPEECH_KEY;
+const speechRegion = process.env.REACT_APP_SPEECH_REGION;
 
 function App() {
   // Query to GPT Model
@@ -49,8 +49,8 @@ function App() {
 
   useEffect(() => {
     speechConfig.current = sdk.SpeechConfig.fromSubscription(
-      SPEECH_KEY,
-      SPEECH_REGION
+      speechKey,
+      speechRegion
     );
     speechConfig.current.speechRecognitionLanguage = 'en-US';
 
