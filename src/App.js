@@ -44,8 +44,19 @@ function App() {
   const audioConfig = useRef(null);
   const recognizer = useRef(null);
 
-  // const [myTranscript, setMyTranscript] = useState("");
-  const [, setRecTranscript] = useState("");
+  const [myTranscript, setMyTranscript] = useState("");
+  const [RecTranscript, setRecTranscript] = useState("");
+
+  const buttonRef = useRef(null);
+  const handleClick = (x, y) => {
+    const rect = buttonRef.current.getBoundingClientRect();
+    const clickEvent = new MouseEvent('click', {
+      bubbles: true,
+      clientX: rect.left + x,
+      clientY: rect.top + y,
+    });
+    buttonRef.current.dispatchEvent(clickEvent);
+  };
 
   useEffect(() => {
     speechConfig.current = sdk.SpeechConfig.fromSubscription(
@@ -66,10 +77,26 @@ function App() {
 
       if (result.reason === sdk.ResultReason.RecognizedSpeech) {
         const transcript = result.text;
-        console.log('Transcript: -->', transcript);
-        // Call a function to process the transcript as needed
-        // setinput(transcript)
+        // console.log('Transcript: -->', transcript);
+        var trimmed_transcript = transcript.toLowerCase();
+        trimmed_transcript = trimmed_transcript.replace(",", " ")
+        trimmed_transcript = trimmed_transcript.replace(".", " ")
+        trimmed_transcript = trimmed_transcript.replace(/\s/g, "");
+        trimmed_transcript = trimmed_transcript.trim();
 
+
+        console.log('Transcript: -->', trimmed_transcript);
+        // Call a function to process the transcript as needed
+        if (
+          trimmed_transcript === "heygptube" || trimmed_transcript === "heygbtube" || trimmed_transcript === "stop"
+          || trimmed_transcript === "stopvideo" || trimmed_transcript === "stopthevideo"
+        ) {
+          console.log("IS THIS WORKING");
+          handleClick(50, 50);
+          alert('Button clicked!')
+        }
+
+        // setinput(transcript)
         // setMyTranscript(transcript);
       }
     };
@@ -82,7 +109,6 @@ function App() {
         // console.log('Transcript: -->', transcript);
         // Call a function to process the transcript as needed
         setinput(transcript)
-
 
         setRecTranscript(transcript);
       }
@@ -134,7 +160,6 @@ function App() {
         </div>
       </div>
       <div className='main'>
-        {/* <iframe class="video-window" src="https://www.youtube.com/embed/wK0N1Bq3948?rel=0"></iframe> */}
         <div className='chats'>
           {messages.map((message, i) => {
             return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
