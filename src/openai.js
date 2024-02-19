@@ -2,17 +2,20 @@
 import { OpenAIClient } from "@azure/openai";
 import { AzureKeyCredential } from "@azure/openai";
 
-// const OpenAIClient = require("@azure/openai");
 
+// const OpenAIClient = require("@azure/openai");
+const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+const apiBase = process.env.REACT_APP_OPENAI_API_BASE;
+const apiDeployment = process.env.REACT_APP_OPENAI_API_DEPLOYMENT;
 export async function sendMessageToOpenAI(message) {
 
     const client = new OpenAIClient(
-        "https://eslsca-openai.openai.azure.com",
-        new AzureKeyCredential("0d368117945a4cb8a0f5b282dd192340")
+        apiBase,
+        new AzureKeyCredential(apiKey)
     );
 
     const response = await client.getChatCompletions(
-        "EsQuA",
+        apiDeployment,
         [{ 'role': 'user', 'content': message }],
     );
 
