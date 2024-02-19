@@ -124,17 +124,19 @@ function App() {
     <div className="App">
       <div className='sideBar'>
         <div className='upperSide'>
-          <div className='upperSideTop'><img src={gptLogo} alt="logo" className='logo' /><span className='brand'>GPTube</span></div>
-          <button className='midButton'><img src={addButton} alt='new chat' className='addButton' /> New Chat </button>
+          <div className='upperSideTop'><span className='brand'>GPTube</span></div>
+          <button className='midButton'> New Chat <span className="edit material-symbols-rounded">edit</span> </button>
 
         </div>
-        <div className='lowerSide'>
+        {/* <div className='lowerSide'>
           <div className='listItems material-symbols-rounded'> light_mode </div>
           <div className='listItems material-symbols-rounded'> Delete </div>
-        </div>
+        </div> */}
       </div>
+
       <div className='main'>
-        {/* <iframe class="video-window" src="https://www.youtube.com/embed/wK0N1Bq3948?rel=0"></iframe> */}
+      <div className="video-div">{ <iframe class="video-window" src="https://www.youtube.com/embed/wK0N1Bq3948?rel=0"></iframe> }</div>
+
         <div className='chats'>
           {messages.map((message, i) => {
             return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
@@ -143,11 +145,11 @@ function App() {
           })}
         </div>
 
-        <div className='chatFooter'>
-          <div className='inputText'>
+        <div className='chatFooter cente'>
+          <div className='inputText '>
             <input type='text' name='' id='' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
             {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
-            {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded'> mic </button> : <button onClick={stopListening} className='send material-symbols-rounded stop'> stop </button>}
+            {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
             <button className='send' onClick={handleSend}> <img src={sendButton} alt='Send Button' /> </button>
           </div>
         </div>
