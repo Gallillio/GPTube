@@ -20,6 +20,20 @@ function App() {
     }
   ]);
 
+  //Text to speech section
+  const [isTextToSpeeching, setIsTextToSpeeching] = useState(true);
+
+  const resumeTextToSpeech = () => {
+    //setIsTextToSpeeching to true when button is clicked
+    setIsTextToSpeeching(false);
+    console.log("resume text to speech");
+  }
+
+  const stopTextToSpeech = () => {
+    setIsTextToSpeeching(true);
+    console.log("Stop text to speech");
+  }
+
   const HandleTextToSpeech = (response) => {
     // Text to speech for GPT result of user query
     //if TTS button is active
@@ -32,28 +46,31 @@ function App() {
     var speechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
     synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig);
 
-    synthesizer.speakTextAsync(
-      response,
-      function (result) {
-        if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
-          // resultDiv.innerHTML += "synthesis finished for [" + response + "].\n";
-          console.log("synthesis finished for [" + response + "].\n");
+    if (isTextToSpeeching) {
+      synthesizer.speakTextAsync(
+        response,
+        function (result) {
+          if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
+            // resultDiv.innerHTML += "synthesis finished for [" + response + "].\n";
+            console.log("synthesis finished for [" + response + "].\n");
 
-        } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
-          // resultDiv.innerHTML += "synthesis failed. Error detail: " + result.errorDetails + "\n";
-          console.log("synthesis failed. Error detail: " + result.errorDetails + "\n");
+          } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
+            // resultDiv.innerHTML += "synthesis failed. Error detail: " + result.errorDetails + "\n";
+            console.log("synthesis failed. Error detail: " + result.errorDetails + "\n");
 
+          }
+          window.console.log(result);
+          synthesizer.close();
+          synthesizer = undefined;
+        },
+        function (err) {
+          window.console.log(err);
+          synthesizer.close();
+          synthesizer = undefined;
         }
-        window.console.log(result);
-        synthesizer.close();
-        synthesizer = undefined;
-      },
-      function (err) {
-        window.console.log(err);
-        synthesizer.close();
-        synthesizer = undefined;
-      }
-    );
+      );
+    }
+
   }
 
   //handle sending messages section
@@ -80,7 +97,7 @@ function App() {
 
 
   // Speech to Text Section
-  const [isListening, setIsListening] = useState(false);
+  const [isListening, setIsListening] = useState(true);
   const speechConfig = useRef(null);
   const audioConfig = useRef(null);
   const recognizer = useRef(null);
@@ -105,7 +122,6 @@ function App() {
 
     const processRecognizedTranscript = (event) => {
       const result = event.result;
-      // console.log('Recognition result:', result);
 
       if (result.reason === sdk.ResultReason.RecognizedSpeech) {
         const transcript = result.text;
@@ -208,6 +224,9 @@ function App() {
             {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
             {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
             <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button>
+
+            {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
+            {isTextToSpeeching ? <button onClick={resumeTextToSpeech} className='send material-symbols-rounded '> text_to_speech </button> : <button onClick={stopTextToSpeech} className=' send material-symbols-rounded'> volume_off </button>}
           </div>
         </div>
       </div>
