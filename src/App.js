@@ -24,12 +24,14 @@ function App() {
   const [isTextToSpeeching, setIsTextToSpeeching] = useState(true);
 
   const resumeTextToSpeech = () => {
-    //setIsTextToSpeeching to true when button is clicked
+    //turn on speech to text
     setIsTextToSpeeching(false);
     console.log("resume text to speech");
   }
 
+
   const stopTextToSpeech = () => {
+    //turn off speech to text
     setIsTextToSpeeching(true);
     console.log("Stop text to speech");
   }
