@@ -1,6 +1,4 @@
 import './App.css';
-import gptLogo from './assets/chatgpt.svg';
-import addButton from './assets/add-30.png';
 import sendButton from './assets/send.svg';
 import userProfilePicture from './assets/user-icon.png';
 import gptImageLogo from './assets/chatgptLogo.svg'
@@ -22,7 +20,48 @@ function App() {
     }
   ]);
 
-  const handleSend = async () => {
+  const HandleTextToSpeech = (response) => {
+    // Text to speech for GPT result of user query
+    //if TTS button is active
+
+    const subscriptionKey = "b0f5184c6c2242f78356246fb06082f9";
+    const serviceRegion = "eastus";
+    const SpeechSDK = window.SpeechSDK;
+    var synthesizer;
+
+    var speechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
+    synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig);
+
+    synthesizer.speakTextAsync(
+      response,
+      function (result) {
+        if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
+          // resultDiv.innerHTML += "synthesis finished for [" + response + "].\n";
+          console.log("synthesis finished for [" + response + "].\n");
+
+        } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
+          // resultDiv.innerHTML += "synthesis failed. Error detail: " + result.errorDetails + "\n";
+          console.log("synthesis failed. Error detail: " + result.errorDetails + "\n");
+
+        }
+        window.console.log(result);
+        synthesizer.close();
+        synthesizer = undefined;
+      },
+      function (err) {
+        window.console.log(err);
+        synthesizer.close();
+        synthesizer = undefined;
+      }
+    );
+  }
+
+  //handle sending messages section
+  const HandleSend = async () => {
+    // after successfully inputting query(input) by user
+    // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
+    // then play text to speech if button is enabled
+
     const text = input;
     setinput("")
     const response = await sendMessageToOpenAI(text);
@@ -31,10 +70,12 @@ function App() {
       { text: input, isBot: false },
       { text: response, isBot: true }
     ]);
+
+    HandleTextToSpeech(response);
   }
 
   const handleEnter = async (e) => {
-    if (e.key === "Enter") await handleSend();
+    if (e.key === "Enter") await HandleSend();
   }
 
 
@@ -48,15 +89,6 @@ function App() {
   const [RecTranscript, setRecTranscript] = useState("");
 
   const buttonRef = useRef(null);
-  const handleClick = (x, y) => {
-    const rect = buttonRef.current.getBoundingClientRect();
-    const clickEvent = new MouseEvent('click', {
-      bubbles: true,
-      clientX: rect.left + x,
-      clientY: rect.top + y,
-    });
-    buttonRef.current.dispatchEvent(clickEvent);
-  };
 
   useEffect(() => {
     speechConfig.current = sdk.SpeechConfig.fromSubscription(
@@ -92,7 +124,6 @@ function App() {
           || trimmed_transcript === "stopvideo" || trimmed_transcript === "stopthevideo"
         ) {
           console.log("IS THIS WORKING");
-          handleClick(50, 50);
           alert('Button clicked!')
         }
 
@@ -161,7 +192,7 @@ function App() {
       </div>
 
       <div className='main'>
-        <div className="video-div">{<iframe class="video-window" src="https://www.youtube.com/embed/wK0N1Bq3948?rel=0"></iframe>}</div>
+        <div className="video-div">{<iframe title='video-window' className="video-window" src="https://www.youtube.com/embed/wK0N1Bq3948?rel=0"></iframe>}</div>
 
         <div className='chats'>
           {messages.map((message, i) => {
@@ -176,7 +207,7 @@ function App() {
             <input type='text' name='' id='' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
             {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
             {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
-            <button className='send' onClick={handleSend}> <img src={sendButton} alt='Send Button' /> </button>
+            <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button>
           </div>
         </div>
       </div>
