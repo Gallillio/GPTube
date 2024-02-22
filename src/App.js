@@ -29,7 +29,6 @@ function App() {
     console.log("resume text to speech");
   }
 
-
   const stopTextToSpeech = () => {
     //turn off speech to text
     setIsTextToSpeeching(true);
@@ -54,14 +53,14 @@ function App() {
         function (result) {
           if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
             // resultDiv.innerHTML += "synthesis finished for [" + response + "].\n";
-            console.log("synthesis finished for [" + response + "].\n");
+            // console.log("synthesis finished for [" + response + "].\n");
 
           } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
             // resultDiv.innerHTML += "synthesis failed. Error detail: " + result.errorDetails + "\n";
-            console.log("synthesis failed. Error detail: " + result.errorDetails + "\n");
+            // console.log("synthesis failed. Error detail: " + result.errorDetails + "\n");
 
           }
-          window.console.log(result);
+          // window.console.log(result);
           synthesizer.close();
           synthesizer = undefined;
         },
@@ -76,21 +75,51 @@ function App() {
   }
 
   //handle sending messages section
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [GPT_response, setGPT_response] = useState("")
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/get_chatbot_response_ajax/?query=" + input)
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setIsLoaded(true);
+          console.log(result)
+          // setinput(result);
+          // console.log(input)
+        },
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
+  }, [messages])
+
   const HandleSend = async () => {
     // after successfully inputting query(input) by user
     // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
     // then play text to speech if button is enabled
 
-    const text = input;
-    setinput("")
-    const response = await sendMessageToOpenAI(text);
     setMessages([
       ...messages,
       { text: input, isBot: false },
-      { text: response, isBot: true }
+      { text: GPT_response, isBot: true }
     ]);
 
-    HandleTextToSpeech(response);
+    HandleTextToSpeech(GPT_response);
+
+
+    //WORKING WITH openai.js
+    // const text = input;
+    // setinput("")
+    // const response = await sendMessageToOpenAI(text);
+    // setMessages([
+    //   ...messages,
+    //   { text: input, isBot: false },
+    //   { text: response, isBot: true }
+    // ]);
+
+    // HandleTextToSpeech(response);
   }
 
   const handleEnter = async (e) => {
@@ -135,7 +164,7 @@ function App() {
         trimmed_transcript = trimmed_transcript.trim();
 
 
-        console.log('Transcript: -->', trimmed_transcript);
+        // console.log('Transcript: -->', trimmed_transcript);
         // Call a function to process the transcript as needed
         if (
           trimmed_transcript === "heygptube" || trimmed_transcript === "heygbtube" || trimmed_transcript === "stop"
@@ -183,7 +212,7 @@ function App() {
     if (!isListening) {
       setIsListening(true);
       recognizer.current.startContinuousRecognitionAsync(() => {
-        console.log('Resumed listening...');
+        // console.log('Resumed listening...');
       });
     }
   };
@@ -191,7 +220,7 @@ function App() {
   const stopListening = () => {
     setIsListening(false);
     recognizer.current.stopContinuousRecognitionAsync(() => {
-      console.log('Speech recognition stopped.');
+      // console.log('Speech recognition stopped.');
     });
   };
 

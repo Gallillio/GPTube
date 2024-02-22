@@ -1,10 +1,14 @@
 from django.shortcuts import render
-from rest_framework.views import APIView
+from django.http import HttpResponse
 from .models import *
 from .serializer import *
-# from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .utils import azure_connect, get_chatbot_response
 from django.http import JsonResponse
+
+def base(request):
+    return HttpResponse("<h2> go to /get_chatbot_response_ajax/")
 
 def get_chatbot_response_ajax(request):
     # Connect to Azure OpenAI 
