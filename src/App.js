@@ -13,12 +13,14 @@ const speechRegion = process.env.REACT_APP_SPEECH_REGION;
 function App() {
   // Query to GPT Model
   const [input, setinput] = useState("");
+  const [query, setQuery] = useState("");
   const [messages, setMessages] = useState([
     {
       text: "Hello, how may I assist you today ",
       isBot: true
     }
   ]);
+  const rendered = useRef(0);
 
   //Text to speech section
   const [isTextToSpeeching, setIsTextToSpeeching] = useState(true);
@@ -78,13 +80,21 @@ function App() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [GPT_response, setGPT_response] = useState("")
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/get_chatbot_response_ajax/?query=" + input)
+
+
+  const queryResponse = async () => {
+    console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
+    setQuery(input);
+    setinput("");
+    console.log("the query is", query);
+    await fetch("http://127.0.0.1:8000/get_chatbot_response_ajax/?query=" + query)
       .then(res => res.json())
       .then(
         (result) => {
           setIsLoaded(true);
-          console.log(result)
+          setGPT_response(result.gpt_response)
+          console.log(result.gpt_response)
+          // setinput("")
           // setinput(result);
           // console.log(input)
         },
@@ -93,20 +103,36 @@ function App() {
           setError(error);
         }
       )
-  }, [messages])
+  }
+
+  useEffect(() => {
+    if (rendered.current >= 2) {
+      console.log("rendered q", query);
+      setMessages([
+        ...messages,
+        { text: query, isBot: false },
+        { text: GPT_response, isBot: true }
+      ]);
+      console.log("res", GPT_response)
+      HandleTextToSpeech(GPT_response);
+      return;
+    }
+    rendered.current++;
+  }, [GPT_response])
+
+  useEffect(() => {
+    if (input != "") { setQuery(input); }
+
+  }, [input])
 
   const HandleSend = async () => {
     // after successfully inputting query(input) by user
     // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
     // then play text to speech if button is enabled
 
-    setMessages([
-      ...messages,
-      { text: input, isBot: false },
-      { text: GPT_response, isBot: true }
-    ]);
+    queryResponse();
 
-    HandleTextToSpeech(GPT_response);
+
 
 
     //WORKING WITH openai.js
