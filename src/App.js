@@ -23,7 +23,7 @@ function App() {
   const rendered = useRef(0);
 
   //Text to speech section
-  const [isTextToSpeeching, setIsTextToSpeeching] = useState(true);
+  const [isTextToSpeeching, setIsTextToSpeeching] = useState(false);
 
   const resumeTextToSpeech = () => {
     //turn on speech to text
@@ -83,20 +83,16 @@ function App() {
 
 
   const queryResponse = async () => {
-    console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
+    // console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
     setQuery(input);
     setinput("");
-    console.log("the query is", query);
     await fetch("http://127.0.0.1:8000/get_chatbot_response_ajax/?query=" + query)
       .then(res => res.json())
       .then(
         (result) => {
           setIsLoaded(true);
           setGPT_response(result.gpt_response)
-          console.log(result.gpt_response)
-          // setinput("")
-          // setinput(result);
-          // console.log(input)
+          // console.log(result.gpt_response)
         },
         (error) => {
           setIsLoaded(true);
@@ -107,13 +103,13 @@ function App() {
 
   useEffect(() => {
     if (rendered.current >= 2) {
-      console.log("rendered q", query);
+      // console.log("rendered q", query);
       setMessages([
         ...messages,
         { text: query, isBot: false },
         { text: GPT_response, isBot: true }
       ]);
-      console.log("res", GPT_response)
+      // console.log("res", GPT_response)
       HandleTextToSpeech(GPT_response);
       return;
     }
@@ -121,7 +117,7 @@ function App() {
   }, [GPT_response])
 
   useEffect(() => {
-    if (input != "") { setQuery(input); }
+    if (input !== "") { setQuery(input); }
 
   }, [input])
 
@@ -131,21 +127,6 @@ function App() {
     // then play text to speech if button is enabled
 
     queryResponse();
-
-
-
-
-    //WORKING WITH openai.js
-    // const text = input;
-    // setinput("")
-    // const response = await sendMessageToOpenAI(text);
-    // setMessages([
-    //   ...messages,
-    //   { text: input, isBot: false },
-    //   { text: response, isBot: true }
-    // ]);
-
-    // HandleTextToSpeech(response);
   }
 
   const handleEnter = async (e) => {
@@ -162,7 +143,7 @@ function App() {
   const [myTranscript, setMyTranscript] = useState("");
   const [RecTranscript, setRecTranscript] = useState("");
 
-  const buttonRef = useRef(null);
+  // const buttonRef = useRef(null);
 
   useEffect(() => {
     speechConfig.current = sdk.SpeechConfig.fromSubscription(
@@ -199,9 +180,6 @@ function App() {
           console.log("IS THIS WORKING");
           alert('Button clicked!')
         }
-
-        // setinput(transcript)
-        // setMyTranscript(transcript);
       }
     };
 
