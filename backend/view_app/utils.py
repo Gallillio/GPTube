@@ -57,7 +57,7 @@ def CompareDatesFunc(given_date):
 
 class CompareDatesTool(BaseTool):
     name = "Compare Dates"
-    description = "Use this tool when user provides a date and asks the difference between the provided date and today.to use the tool you must provide the following parameters: [given_date]."
+    description = "use this tool when you have a date and need to subtract it from today's date"
     def _run(self, given_date: str = None,):
         # check for the values we have been given
         if given_date:
@@ -85,6 +85,11 @@ def MakeAgentWithMemory(model, tools):
     )
     return agent
 
+# def UseAgent():
+    """
+    This function is to add the queries
+    """
+
 def get_chatbot_response(user_input): #user_input = query
     """
     Takes user_query and returns chatgpt response
@@ -97,6 +102,7 @@ def get_chatbot_response(user_input): #user_input = query
     tools = [CompareDatesTool()]
 
     agent = MakeAgentWithMemory(model, tools)
-    # print(agent)
+    print("\n\n\n ANSWER: ", agent(user_input))
+
 
     return agent(user_input)
