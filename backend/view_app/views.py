@@ -1,16 +1,17 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
-from .serializer import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .utils import ConnectToAzure, get_chatbot_response
+from .utils import ConnectToAzure, GetChatboxResponse
 from django.http import JsonResponse
 
 def base(request):
-    return HttpResponse("<h2> go to /get_chatbot_response_ajax/")
+    return HttpResponse("<h2> go to /GetChatbotResponseAjax/")
 
-def get_chatbot_response_ajax(request):
+
+
+def GetChatbotResponseAjax(request):
     # Connect to Azure OpenAI 
     # azure_connect()
     ConnectToAzure()
@@ -18,7 +19,7 @@ def get_chatbot_response_ajax(request):
     if request.method == 'GET':
         query = request.GET.get('query')
 
-        gpt_response = get_chatbot_response(query)
+        gpt_response = GetChatboxResponse(query)
 
         return JsonResponse({"gpt_response": gpt_response['output']})
     else:

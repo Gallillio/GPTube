@@ -2,7 +2,6 @@ import './App.css';
 import sendButton from './assets/send.svg';
 import userProfilePicture from './assets/user-icon.png';
 import gptImageLogo from './assets/chatgptLogo.svg'
-import { sendMessageToOpenAI } from './openai';
 import React, { useState, useEffect, useRef } from 'react';
 
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
@@ -87,12 +86,11 @@ function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [GPT_response, setGPT_response] = useState("")
 
-
   const queryResponse = async () => {
     // console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
     setQuery(input);
     setinput("");
-    await fetch("http://127.0.0.1:8000/get_chatbot_response_ajax/?query=" + query)
+    await fetch("http://127.0.0.1:8000/GetChatbotResponseAjax/?query=" + query)
       .then(res => res.json())
       .then(
         (result) => {
