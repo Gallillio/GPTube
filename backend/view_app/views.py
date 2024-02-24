@@ -4,7 +4,7 @@ from .models import *
 from .serializer import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .utils import azure_connect, get_chatbot_response
+from .utils import ConnectToAzure, get_chatbot_response
 from django.http import JsonResponse
 
 def base(request):
@@ -12,13 +12,14 @@ def base(request):
 
 def get_chatbot_response_ajax(request):
     # Connect to Azure OpenAI 
-    azure_connect()
+    # azure_connect()
+    ConnectToAzure()
 
     if request.method == 'GET':
         query = request.GET.get('query')
 
         gpt_response = get_chatbot_response(query)
 
-        return JsonResponse({"gpt_response": gpt_response})
+        return JsonResponse({"gpt_response": gpt_response['output']})
     else:
         return JsonResponse({'gpt_response': "Method not allowed"}, status=405)

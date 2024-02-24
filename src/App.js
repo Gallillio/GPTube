@@ -23,41 +23,47 @@ function App() {
   const rendered = useRef(0);
 
   //Text to speech section
-  const [isTextToSpeeching, setIsTextToSpeeching] = useState(true);
+  const [isTextToSpeeching, setIsTextToSpeeching] = useState(false);
+  const subscriptionKey = "b0f5184c6c2242f78356246fb06082f9";
+  const serviceRegion = "eastus";
+  const SpeechSDK = window.SpeechSDK;
+  var synthesizer;
 
-  const resumeTextToSpeech = () => {
-    //turn on speech to text
-    setIsTextToSpeeching(false);
-    console.log("resume text to speech");
-  }
+  var textToSpeechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
+  var player = new SpeechSDK.SpeakerAudioDestination();
+  var audioConfigTextToSpeech = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+  synthesizer = new SpeechSDK.SpeechSynthesizer(textToSpeechConfig, audioConfigTextToSpeech);
 
   const stopTextToSpeech = () => {
     //turn off speech to text
-    setIsTextToSpeeching(true);
+    setIsTextToSpeeching(false);
     console.log("Stop text to speech");
+  }
+
+  const resumeTextToSpeech = () => {
+    //turn on speech to text
+    setIsTextToSpeeching(true);
+    console.log("resume text to speech");
   }
 
   const HandleTextToSpeech = (response) => {
     // Text to speech for GPT result of user query
-    //if TTS button is active
+    player.onAudioEnd = () => {
+      console.log("Finished speaking");
+    };
 
-    const subscriptionKey = "b0f5184c6c2242f78356246fb06082f9";
-    const serviceRegion = "eastus";
-    const SpeechSDK = window.SpeechSDK;
-    var synthesizer;
-
-    var speechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
-    synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig);
+    // synthesizer = new SpeechSDK.SpeechSynthesizer(textToSpeechConfig, SpeechSDK.AudioConfig.fromDefaultSpeakerOutput());
 
     if (isTextToSpeeching) {
       synthesizer.speakTextAsync(
         response,
         function (result) {
           if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
+            console.log("Done");
             // resultDiv.innerHTML += "synthesis finished for [" + response + "].\n";
             // console.log("synthesis finished for [" + response + "].\n");
-
           } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
+            console.log("cancelled");
             // resultDiv.innerHTML += "synthesis failed. Error detail: " + result.errorDetails + "\n";
             // console.log("synthesis failed. Error detail: " + result.errorDetails + "\n");
 
@@ -83,20 +89,16 @@ function App() {
 
 
   const queryResponse = async () => {
-    console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
+    // console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
     setQuery(input);
     setinput("");
-    console.log("the query is", query);
     await fetch("http://127.0.0.1:8000/get_chatbot_response_ajax/?query=" + query)
       .then(res => res.json())
       .then(
         (result) => {
           setIsLoaded(true);
           setGPT_response(result.gpt_response)
-          console.log(result.gpt_response)
-          // setinput("")
-          // setinput(result);
-          // console.log(input)
+          // console.log(result.gpt_response)
         },
         (error) => {
           setIsLoaded(true);
@@ -107,13 +109,13 @@ function App() {
 
   useEffect(() => {
     if (rendered.current >= 2) {
-      console.log("rendered q", query);
+      // console.log("rendered q", query);
       setMessages([
         ...messages,
         { text: query, isBot: false },
         { text: GPT_response, isBot: true }
       ]);
-      console.log("res", GPT_response)
+      // console.log("res", GPT_response)
       HandleTextToSpeech(GPT_response);
       return;
     }
@@ -121,7 +123,7 @@ function App() {
   }, [GPT_response])
 
   useEffect(() => {
-    if (input != "") { setQuery(input); }
+    if (input !== "") { setQuery(input); }
 
   }, [input])
 
@@ -129,23 +131,7 @@ function App() {
     // after successfully inputting query(input) by user
     // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
     // then play text to speech if button is enabled
-
     queryResponse();
-
-
-
-
-    //WORKING WITH openai.js
-    // const text = input;
-    // setinput("")
-    // const response = await sendMessageToOpenAI(text);
-    // setMessages([
-    //   ...messages,
-    //   { text: input, isBot: false },
-    //   { text: response, isBot: true }
-    // ]);
-
-    // HandleTextToSpeech(response);
   }
 
   const handleEnter = async (e) => {
@@ -155,26 +141,24 @@ function App() {
 
   // Speech to Text Section
   const [isListening, setIsListening] = useState(true);
-  const speechConfig = useRef(null);
-  const audioConfig = useRef(null);
+  const speechToTextConfig = useRef(null);
+  const audioConfigSpeechToText = useRef(null);
   const recognizer = useRef(null);
 
   const [myTranscript, setMyTranscript] = useState("");
   const [RecTranscript, setRecTranscript] = useState("");
 
-  const buttonRef = useRef(null);
-
   useEffect(() => {
-    speechConfig.current = sdk.SpeechConfig.fromSubscription(
+    speechToTextConfig.current = sdk.SpeechConfig.fromSubscription(
       speechKey,
       speechRegion
     );
-    speechConfig.current.speechRecognitionLanguage = 'en-US';
+    speechToTextConfig.current.speechRecognitionLanguage = 'en-US';
 
-    audioConfig.current = sdk.AudioConfig.fromDefaultMicrophoneInput();
+    audioConfigSpeechToText.current = sdk.AudioConfig.fromDefaultMicrophoneInput();
     recognizer.current = new sdk.SpeechRecognizer(
-      speechConfig.current,
-      audioConfig.current
+      speechToTextConfig.current,
+      audioConfigSpeechToText.current
     );
 
     const processRecognizedTranscript = (event) => {
@@ -199,9 +183,6 @@ function App() {
           console.log("IS THIS WORKING");
           alert('Button clicked!')
         }
-
-        // setinput(transcript)
-        // setMyTranscript(transcript);
       }
     };
 
@@ -283,7 +264,7 @@ function App() {
             <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button>
 
             {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
-            {isTextToSpeeching ? <button onClick={resumeTextToSpeech} className='send material-symbols-rounded '> text_to_speech </button> : <button onClick={stopTextToSpeech} className=' send material-symbols-rounded'> volume_off </button>}
+            {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded'> volume_off </button>}
           </div>
         </div>
       </div>
