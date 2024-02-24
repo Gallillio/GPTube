@@ -16,6 +16,7 @@ from langchain.tools import BaseTool
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
+agent = None
 
 def ConnectToAzure():
     """
@@ -85,10 +86,17 @@ def MakeAgentWithMemory(model, tools):
     )
     return agent
 
-# def UseAgent():
+def UseAgent():
     """
-    This function is to add the queries
+    This function is to properly add memory
+    by using MakeAgentWithMemory()
     """
+    model = ConnectToAzure()
+    #All tools
+    tools = [CompareDatesTool()]
+    agent = MakeAgentWithMemory(model, tools)
+    
+    return agent
 
 def get_chatbot_response(user_input): #user_input = query
     """
@@ -96,13 +104,8 @@ def get_chatbot_response(user_input): #user_input = query
     parameter:
         user_input: query user enters
     """
-    #Connect To Azure 
-    model = ConnectToAzure()
-    #All tools
-    tools = [CompareDatesTool()]
-
-    agent = MakeAgentWithMemory(model, tools)
-    print("\n\n\n ANSWER: ", agent(user_input))
-
-
+    global agent
+    if agent is None:
+        # If agent is not initialized, call UseAgent() to initialize it
+        agent = UseAgent()
     return agent(user_input)
