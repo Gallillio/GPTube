@@ -26,3 +26,4 @@ yarn-debug.log*
 yarn-error.log*
 backend/view_app/__pycache__/utils.cpython-311.pyc
 backend/view_app/__pycache__/views.cpython-311.pyc
+*.pyc

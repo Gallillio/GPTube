@@ -98,7 +98,7 @@ def UseAgent():
     
     return agent
 
-def get_chatbot_response(user_input): #user_input = query
+def GetChatboxResponse(user_input): #user_input = query
     """
     Takes user_query and returns chatgpt response
     parameter:
