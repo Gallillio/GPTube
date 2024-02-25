@@ -18,6 +18,11 @@ from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 agent = None
 
+"""
+if use scenario: use_scenario = Trye
+if use chatbot: use_scenario = False
+"""
+
 def ConnectToAzure():
     """
     desc:
@@ -40,6 +45,15 @@ def ConnectToAzure():
         openai_api_type=OPENAI_API_TYPE,
     )
     return model
+
+## Scenarios Section ##
+
+
+def UseScenarioOrChatbot():
+    # query = test me on this subject
+    ...
+
+## CHATBOT SECTION ##
 
 def CompareDatesFunc(given_date):
     if "," in given_date:
@@ -101,11 +115,16 @@ def UseAgent():
 def GetChatboxResponse(user_input): #user_input = query
     """
     Takes user_query and returns chatgpt response
+    use_scenario = False because text here will be displayed in chatbot
     parameter:
         user_input: query user enters
     """
+    use_scenario = False
     global agent
+
     if agent is None:
         # If agent is not initialized, call UseAgent() to initialize it
         agent = UseAgent()
-    return agent(user_input)
+
+    print("\n\n\n\n", agent(user_input))
+    return agent(user_input), use_scenario
