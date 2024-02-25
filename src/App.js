@@ -96,6 +96,7 @@ function App() {
         (result) => {
           setIsLoaded(true);
           setGPT_response(result.gpt_response)
+          console.log(result.use_scenario)
           // console.log(result.gpt_response)
         },
         (error) => {
