@@ -3,6 +3,7 @@ import sendButton from './assets/send.svg';
 import userProfilePicture from './assets/user-icon.png';
 import gptImageLogo from './assets/chatgptLogo.svg'
 import React, { useState, useEffect, useRef } from 'react';
+import Video from './Video'; // Import MovieClip component
 
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
 
@@ -245,8 +246,8 @@ function App() {
       </div>
 
       <div className='main'>
-        <div className="video-div">{<iframe title='video-window' className="video-window" src="https://www.youtube.com/embed/wK0N1Bq3948?rel=0"></iframe>}</div>
-
+        {/* Include Video component */}
+        <Video/>
         <div className='chats'>
           {messages.map((message, i) => {
             return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
