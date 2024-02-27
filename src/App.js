@@ -105,7 +105,7 @@ function App() {
         }
       )
   }
-
+  
   useEffect(() => {
     if (rendered.current >= 2) {
       // console.log("rendered q", query);

@@ -23,6 +23,7 @@ def GetChatbotResponseAjax(request):
 
         gpt_response, use_scenario = GetChatboxResponse(query)
 
-        return JsonResponse({"gpt_response": gpt_response['output'], "use_scenario": use_scenario})
+        # return JsonResponse({"gpt_response": gpt_response['output'], "use_scenario": use_scenario})
+        return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario})
     else:
         return JsonResponse({'gpt_response': "Method not allowed"}, status=405)
