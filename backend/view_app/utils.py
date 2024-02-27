@@ -5,6 +5,7 @@ handle any HTTP requests or anything related to views
 """
 #imports
 import openai
+import json
 import pandas as pd
 import os
 import faiss
@@ -222,7 +223,7 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
     if conversation is None:
     # If agent is not initialized, call UseAgent() to initialize it
     #     agent = UseAgent()
-        csv_file = "data/videos_transcript.csv"
+        csv_file = "videos_transcript.csv"
         video_data_json = get_video_data(csv_file, video_id)
         conversation = ConversationChainWithMemory(video_data_json, stopped_time)
 
@@ -234,3 +235,7 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
 
 #response, user = GetChatboxResponse(user_input = 'Illustrate the last 60 seconds', video_id = '-9TdpdjDtAM', stopped_time = '90')
 #print(f'Response = {response}')
+# csv_file = "data/videos_transcript.csv"
+
+# video_data_json = get_video_data(csv_file, 'zgtepSTqzgc')
+# print(video_data_json)
