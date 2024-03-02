@@ -88,19 +88,23 @@ function App() {
   const [GPT_response, setGPT_response] = useState("")
 
   const queryResponse = async () => {
+    console.log("5", myTranscript, input)
     // console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
     setQuery(input);
+    console.log("6", myTranscript, input)
     setinput("");
+    console.log("7", myTranscript, input)
     await fetch("http://127.0.0.1:8000/GetChatbotResponseAjax/?query=" + query)
       .then(res => res.json())
       .then(
         (result) => {
+          console.log("8", myTranscript, input)
           setIsLoaded(true);
           setGPT_response(result.gpt_response)
-          console.log(result.use_scenario)
           // console.log(result.gpt_response)
         },
         (error) => {
+          console.log("9", myTranscript, input)
           setIsLoaded(true);
           setError(error);
         }
@@ -123,17 +127,21 @@ function App() {
   }, [GPT_response])
 
   useEffect(() => {
+    console.log("the input is", input, "and the query is", query);
     if (input !== "") { setQuery(input); }
 
   }, [input])
 
   const HandleSend = async () => {
+    console.log("2", myTranscript, input)
     // after successfully inputting query(input) by user
     // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
     // then play text to speech if button is enabled
     if (input.trim().length !== 0) {
+      console.log("3", myTranscript, input)
       queryResponse();
     } else {
+      console.log("4", myTranscript, input)
       console.log("Input field is empty")
     }
     // queryResponse();
@@ -165,6 +173,12 @@ function App() {
   const [RecTranscript, setRecTranscript] = useState("");
 
   useEffect(() => {
+    console.log("input is ", input);
+    console.log("transcript is", myTranscript);
+
+  }, [input, myTranscript])
+
+  useEffect(() => {
     speechToTextConfig.current = sdk.SpeechConfig.fromSubscription(
       speechKey,
       speechRegion
@@ -179,13 +193,20 @@ function App() {
 
     const processRecognizedTranscript = (event) => {
       const result = event.result;
+      console.log("ana gy aneek el dnya");
 
       if (result.reason === sdk.ResultReason.RecognizedSpeech) {
+        const transcript = result.text;
+        console.log("ana gy aneek el dnya tany");
         stopListening();
+        console.log("ana ha8ayar transcript nowwww", transcript)
+        setMyTranscript(transcript)
+        console.log("1", transcript, input)
+        // queryResponse();
         HandleSend();
 
-        const transcript = result.text;
         console.log('Transcript: -->', transcript);
+        console.log("19", myTranscript, input)
         var trimmed_transcript = transcript.toLowerCase();
         trimmed_transcript = trimmed_transcript.replace(",", " ")
         trimmed_transcript = trimmed_transcript.replace(".", " ")
