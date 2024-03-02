@@ -13,7 +13,9 @@
 
 # pychache in backend
 backend/view_app/__pycache__/
+backend/backend/__pycache__/
 backend/env/
+
 # misc
 .DS_Store
 .env.local

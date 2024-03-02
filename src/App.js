@@ -106,7 +106,7 @@ function App() {
         }
       )
   }
-  
+
   useEffect(() => {
     if (rendered.current >= 2) {
       // console.log("rendered q", query);
@@ -247,7 +247,7 @@ function App() {
 
       <div className='main'>
         {/* Include Video component */}
-        <Video/>
+        <Video />
         <div className='chats'>
           {messages.map((message, i) => {
             return <div key={i} className={message.isBot ? "chat bot" : "chat"}>

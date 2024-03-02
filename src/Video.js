@@ -16,7 +16,7 @@ class MovieClip extends React.Component {
     this.setState({ stoppedTime });
     // Log the stopped time to the console
     console.log("Video stopped at:", stoppedTime);
-    
+
     // Send stopped time and video ID to backend
     const videoId = event.target.getVideoData().video_id;
     this.sendStoppedTimeToBackend(stoppedTime, videoId);
@@ -25,7 +25,7 @@ class MovieClip extends React.Component {
   sendStoppedTimeToBackend(stoppedTime, videoId) {
     // Make a GET request to your backend API
     fetch(`http://127.0.0.1:8000/GetTimeAndID/?stoppedTime=${stoppedTime}&videoId=${videoId}`)
-    .then(response => {
+      .then(response => {
         if (response.ok) {
           console.log('Data received successfully');
         } else {
@@ -49,7 +49,7 @@ class MovieClip extends React.Component {
 
     return (
       <div className="video-div">
-        <YouTube videoId="-9TdpdjDtAM" options={options} onPause={this._onPause} />
+        <YouTube videoId="IX0iGf2wYM0" options={options} onPause={this._onPause} />
         {/* You can display the stopped time if needed */}
         {this.state.stoppedTime && <p>Video stopped at: {this.state.stoppedTime}</p>}
       </div>
