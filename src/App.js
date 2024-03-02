@@ -131,13 +131,29 @@ function App() {
     // after successfully inputting query(input) by user
     // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
     // then play text to speech if button is enabled
-    queryResponse();
+    if (input.trim().length !== 0) {
+      queryResponse();
+    } else {
+      console.log("Input field is empty")
+    }
+    // queryResponse();
   }
 
   const handleEnter = async (e) => {
     if (e.key === "Enter") await HandleSend();
   }
 
+  /// scroll down button start 
+  const chatContainerRef = useRef(null);
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  })
 
   // Speech to Text Section
   const [isListening, setIsListening] = useState(true);
@@ -165,8 +181,11 @@ function App() {
       const result = event.result;
 
       if (result.reason === sdk.ResultReason.RecognizedSpeech) {
+        stopListening();
+        HandleSend();
+
         const transcript = result.text;
-        // console.log('Transcript: -->', transcript);
+        console.log('Transcript: -->', transcript);
         var trimmed_transcript = transcript.toLowerCase();
         trimmed_transcript = trimmed_transcript.replace(",", " ")
         trimmed_transcript = trimmed_transcript.replace(".", " ")
@@ -248,7 +267,7 @@ function App() {
       <div className='main'>
         {/* Include Video component */}
         <Video />
-        <div className='chats'>
+        <div className='chats' ref={chatContainerRef}>
           {messages.map((message, i) => {
             return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
               <img src={message.isBot ? gptImageLogo : userProfilePicture} alt="" className='chatImg' /> <p className="textOutput"> {message.text} </p>

@@ -12,8 +12,8 @@
 /build
 
 # pychache in backend
-backend/view_app/__pycache__/
-backend/backend/__pycache__/
+backend/view_app/__pycache__
+backend/backend/__pycache__
 backend/env/
 
 # misc
