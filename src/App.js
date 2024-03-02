@@ -35,7 +35,7 @@ function App() {
   synthesizer = new SpeechSDK.SpeechSynthesizer(textToSpeechConfig, audioConfigTextToSpeech);
 
   const stopTextToSpeech = () => {
-    //turn off speech to text
+    //turn off speech to texta
     setIsTextToSpeeching(false);
     console.log("Stop text to speech");
   }
