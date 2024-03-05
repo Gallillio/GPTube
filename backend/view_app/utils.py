@@ -54,8 +54,6 @@ def ConnectToAzure():
     )
     return model
 
-## Scenarios Section ##
-
 def ConnectToAzureEmbedding():
     OPENAI_API_TYPE = os.getenv("OPENAI_API_TYPE")
     OPENAI_API_VERSION = os.getenv("OPENAI_API_VERSION")
@@ -69,7 +67,6 @@ def ConnectToAzureEmbedding():
     openai_api_type=OPENAI_API_TYPE,
 )
 
-
 def MemoryWithVectorStore():
     embeddings = ConnectToAzureEmbedding()
     embedding_size = 1536 # Dimensions of the OpenAIEmbeddings
@@ -81,7 +78,7 @@ def MemoryWithVectorStore():
 
 def ConversationChainWithMemory(video_data, stopped_time):
     _DEFAULT_TEMPLATE = """The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.
-    You're an AI Video Chat that helps people with anything he doesn't understand in the video given a transcript and stopped time
+    You're an AI Video Chat that helps people with anything they don't understand in the video given a transcript and stopped time
     Respond to the human as a professional bot and don't mention transcript word or something like this, we're here in a backend
     As an example:    Human: can you illustrate the last five mins
     AI: --respond here from the transcript and given time 
@@ -114,6 +111,65 @@ def ConversationChainWithMemory(video_data, stopped_time):
 def UseScenarioOrChatbot():
     # query = test me on this subject
     ...
+
+def get_video_data(csv_file, video_id):
+    """
+    Function to read a CSV file and retrieve text data along with start and duration for a given video_id.
+
+    Parameters:
+    csv_file (str): Path to the CSV file.
+    video_id (str): ID of the video to retrieve data for.
+
+    Returns:
+    str: JSON formatted string containing text data, start, and duration for the given video_id.
+    """
+    try:
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(csv_file)
+
+        # Filter the DataFrame to get data for the given video_id
+        video_data = df[df['video_id'] == video_id]
+
+        # Extract text, start, and duration data
+        video_text_data = [{"text": row['text'], "start": row['start'], "duration": row['duration']} for index, row in video_data.iterrows()]
+
+        # Convert the extracted data to JSON format
+        json_data = json.dumps(video_text_data, indent=4)
+
+        return json_data
+
+    except FileNotFoundError:
+        print(f"Error: File '{csv_file}' not found.")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
+    
+
+def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
+    """
+    Takes user_query and returns chatgpt response
+    use_scenario = False because text here will be displayed in chatbot
+    parameter:
+        user_input: query user enters
+    """
+    use_scenario = False
+    global conversation
+
+    if conversation is None:
+        csv_file = "videos_transcript.csv"
+        video_data_json = get_video_data(csv_file, video_id)
+        conversation = ConversationChainWithMemory(video_data_json, stopped_time)
+
+    return conversation.predict(input = user_input), use_scenario   
+
+#response, user = GetChatboxResponse(user_input = 'Illustrate the last 60 seconds', video_id = '-9TdpdjDtAM', stopped_time = '90')
+#print(f'Response = {response}')
+# csv_file = "data/videos_transcript.csv"
+
+# video_data_json = get_video_data(csv_file, 'zgtepSTqzgc')
+# print(video_data_json)
+
 
 ## CHATBOT SECTION ##
 
@@ -174,68 +230,3 @@ def UseScenarioOrChatbot():
 #     agent = MakeAgentWithMemory(model, tools)
     
 #     return agent
-
-
-def get_video_data(csv_file, video_id):
-    """
-    Function to read a CSV file and retrieve text data along with start and duration for a given video_id.
-
-    Parameters:
-    csv_file (str): Path to the CSV file.
-    video_id (str): ID of the video to retrieve data for.
-
-    Returns:
-    str: JSON formatted string containing text data, start, and duration for the given video_id.
-    """
-    try:
-        # Read the CSV file into a DataFrame
-        df = pd.read_csv(csv_file)
-
-        # Filter the DataFrame to get data for the given video_id
-        video_data = df[df['video_id'] == video_id]
-
-        # Extract text, start, and duration data
-        video_text_data = [{"text": row['text'], "start": row['start'], "duration": row['duration']} for index, row in video_data.iterrows()]
-
-        # Convert the extracted data to JSON format
-        json_data = json.dumps(video_text_data, indent=4)
-
-        return json_data
-
-    except FileNotFoundError:
-        print(f"Error: File '{csv_file}' not found.")
-        return None
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        return None
-    
-
-def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
-    """
-    Takes user_query and returns chatgpt response
-    use_scenario = False because text here will be displayed in chatbot
-    parameter:
-        user_input: query user enters
-    """
-    use_scenario = False
-    global conversation
-
-    if conversation is None:
-    # If agent is not initialized, call UseAgent() to initialize it
-    #     agent = UseAgent()
-        csv_file = "videos_transcript.csv"
-        video_data_json = get_video_data(csv_file, video_id)
-        conversation = ConversationChainWithMemory(video_data_json, stopped_time)
-
-    # print("\n\n\n\n", agent(user_input))
-    # return agent(user_input), use_scenario
-
-    # print("\n\n\n\n", chat.predict(input = user_input))
-    return conversation.predict(input = user_input), use_scenario   
-
-#response, user = GetChatboxResponse(user_input = 'Illustrate the last 60 seconds', video_id = '-9TdpdjDtAM', stopped_time = '90')
-#print(f'Response = {response}')
-# csv_file = "data/videos_transcript.csv"
-
-# video_data_json = get_video_data(csv_file, 'zgtepSTqzgc')
-# print(video_data_json)

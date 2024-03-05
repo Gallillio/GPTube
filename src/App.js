@@ -133,7 +133,6 @@ function App() {
   }, [input])
 
   const HandleSend = async () => {
-    console.log("2", myTranscript, input)
     // after successfully inputting query(input) by user
     // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
     // then play text to speech if button is enabled
@@ -141,7 +140,6 @@ function App() {
       console.log("3", myTranscript, input)
       queryResponse();
     } else {
-      console.log("4", myTranscript, input)
       console.log("Input field is empty")
     }
     // queryResponse();
@@ -288,6 +286,10 @@ function App() {
       <div className='main'>
         {/* Include Video component */}
         <Video />
+        <div className='scenarioBox'>
+          <h4> Scenario Box </h4>
+        </div>
+
         <div className='chats' ref={chatContainerRef}>
           {messages.map((message, i) => {
             return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
@@ -299,12 +301,14 @@ function App() {
         <div className='chatFooter cente'>
           <div className='inputText '>
             <input type='text' name='' id='' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
+
             {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
             {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
             <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button>
 
             {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
             {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded'> volume_off </button>}
+            <button>Quiz Scenario</button>
           </div>
         </div>
       </div>

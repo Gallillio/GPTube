@@ -16,10 +16,10 @@ def UseScenarioOrChatbotResponse(request):
     if request.method == 'GET':
         query = request.GET.get('query')
 
-
 def GetChatbotResponseAjax(request):
     # Connect to Azure OpenAI 
     ConnectToAzure()
+    
     global stopped_time, video_id
     stopped_time = None  # Initialize stopped_time
     video_id = None  # Initialize video_id
@@ -46,8 +46,6 @@ def GetChatbotResponseAjax(request):
         return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario})
     else:
         return JsonResponse({'gpt_response': "Method not allowed"}, status=405)
-
-
 
 def GetTimeAndID(request):
     if request.method == 'GET':
@@ -76,7 +74,6 @@ def GetTimeAndID(request):
             return JsonResponse({'Stopped_Time': None, 'Video_ID': None})
         except Exception as e:
             return JsonResponse({'Stopped_Time': "Error occurred: " + str(e)}, status=500)
-
 
 
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))

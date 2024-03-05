@@ -1,0 +1,55 @@
+{
+    "questions": [
+      {
+        "question": "What is supervised machine learning?",
+        "options": [
+          "A. A type of learning where the model learns from labeled data.",
+          "B. A type of learning where the model learns from unlabeled data.",
+          "C. A type of learning where the model learns from reinforcement.",
+          "D. A type of learning where the model learns from semi-labeled data."
+        ],
+        "answer": "A"
+      },
+      {
+        "question": "Which of the following is an example of supervised learning algorithm?",
+        "options": [
+          "A. K-Means clustering",
+          "B. Decision tree",
+          "C. K-Nearest Neighbors",
+          "D. Apriori algorithm"
+        ],
+        "answer": "B"
+      },
+      {
+        "question": "What is the primary goal of supervised learning?",
+        "options": [
+          "A. To minimize error on the training data.",
+          "B. To maximize accuracy on the test data.",
+          "C. To generalize well on unseen data.",
+          "D. To memorize the training data."
+        ],
+        "answer": "C"
+      },
+      {
+        "question": "Which of the following tasks is NOT typically performed in supervised learning?",
+        "options": [
+          "A. Classification",
+          "B. Clustering",
+          "C. Regression",
+          "D. Anomaly detection"
+        ],
+        "answer": "B"
+      },
+      {
+        "question": "What is the process of supervised learning?",
+        "options": [
+          "A. Feature engineering, model selection, training, evaluation",
+          "B. Data collection, feature selection, training, deployment",
+          "C. Data preprocessing, model training, testing, deployment",
+          "D. Feature extraction, model validation, testing, deployment"
+        ],
+        "answer": "C"
+      }
+    ]
+  }
+  
