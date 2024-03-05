@@ -29,7 +29,7 @@ def GetChatbotResponseAjax(request):
         
         # Attempt to read stopped_time and video_id from file
         try:
-            with open("video_data.json", "r") as f:
+            with open("video_data/video_data.json", "r") as f:
                 data = json.load(f)
             stopped_time = data.get('Stopped_Time', stopped_time)
             video_id = data.get('Video_ID', video_id)
@@ -61,7 +61,7 @@ def GetTimeAndID(request):
 
         # Save stopped_time and video_id to a file
         data = {"Stopped_Time": stopped_time, "Video_ID": video_id}
-        with open("video_data.json", "w") as f:
+        with open("video_data/video_data.json", "w") as f:
             json.dump(data, f)
 
         # You can return a JSON response confirming the receipt of data
@@ -69,7 +69,7 @@ def GetTimeAndID(request):
     else:
         # Read from the file if it exists
         try:
-            with open("video_data.json", "r") as f:
+            with open("video_data/video_data.json", "r") as f:
                 data = json.load(f)
             return JsonResponse(data)
         except FileNotFoundError:
