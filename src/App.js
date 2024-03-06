@@ -267,6 +267,9 @@ function App() {
       <div className='main'>
         {/* Include Video component */}
         <Video />
+        <div className='scenarioBox'>
+          scenario box
+        </div>
         <div className='chats' ref={chatContainerRef}>
           {messages.map((message, i) => {
             return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
@@ -284,6 +287,7 @@ function App() {
 
             {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
             {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded'> volume_off </button>}
+            <button> Quiz scenario </button>
           </div>
         </div>
       </div>
