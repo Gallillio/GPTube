@@ -122,8 +122,8 @@ function App() {
         rendered.current++;
     }, [GPT_response])
 
-  useEffect(() => {
-    if (input !== "") { setQuery(input); }
+    useEffect(() => {
+        if (input !== "") { setQuery(input); }
 
     }, [input])
 
@@ -251,45 +251,65 @@ function App() {
     };
 
 
-  return (
-    <div className="App">
-      <div className='sideBar'>
-        <div className='upperSide'>
-          <div className='upperSideTop'><span className='brand'>GPTube</span></div>
-          <button className='midButton'> New Chat <span className="edit material-symbols-rounded">edit</span> </button>
-
-        </div>
-        {/* <div className='lowerSide'>
-          <div className='listItems material-symbols-rounded'> light_mode </div>
-          <div className='listItems material-symbols-rounded'> Delete </div>
-        </div> */}
-      </div>
-
-      <div className='main'>
-        {/* Include Video component */}
-        <Video />
-        <div className='chats' ref={chatContainerRef}>
-          {messages.map((message, i) => {
-            return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
-              <img src={message.isBot ? gptImageLogo : userProfilePicture} alt="" className='chatImg' /> <p className="textOutput"> {message.text} </p>
+    return (
+        <div className="App">
+            <div className='left-section'>
+                <div>
+                    <img src={userProfilePicture} className='user-profile-picture' />
+                    <hr />
+                </div>
+                <div className="left-section-lower-part">
+                    <hr />
+                    {/* <div className='left-section-icons'>
+                        <span className='material-symbols-rounded left-section-icon-size' id="theme-btn"> light_mode </span> Light Mode
+                    </div> */}
+                    <div className='left-section-icons'>
+                        <span className='material-symbols-rounded left-section-icon-size'> Settings </span> Settings
+                    </div>
+                    <div className='left-section-icons'>
+                        <span className='material-symbols-rounded left-section-icon-size'> Logout </span> Logout
+                    </div>
+                </div>
             </div>
-          })}
-        </div>
+            <div className="middle-section">
+                <div className='center-video'>
+                    <Video />
+                </div>
+                <div className="scenario-section">
+                    <h3> scenario-section </h3>
+                    <button> Quiz scenario </button>
 
-        <div className='chatFooter cente'>
-          <div className='inputText '>
-            <input type='text' name='' id='' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
-            {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
-            {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
-            <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button>
+                </div>
+            </div>
+            <div className="right-section">
+                <div className='livechat-title'>
+                    <h2> Live Chat </h2>
+                    <hr />
+                    <br />
+                </div>
+                <div className="chatbox" ref={chatContainerRef}>
+                    {messages.map((message, i) => {
+                        return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
+                            <img src={message.isBot ? gptImageLogo : userProfilePicture} alt="" className='chatImg' /> <p className="textOutput"> {message.text} </p>
+                        </div>
+                    })}
+                </div>
 
-            {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
-            {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded'> volume_off </button>}
-          </div>
+                <div className='chatFooter center'>
+                    <div className='inputText '>
+                        <textarea type='text' name='' id='chat-input' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} spellcheck="true" />
+                        {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
+                        {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
+                        {/* <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button> */}
+                        <button className='send material-symbols-rounded' onClick={HandleSend}> send </button>
+
+                        {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
+                        {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded'> volume_off </button>}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default App;
