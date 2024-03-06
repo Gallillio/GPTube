@@ -15,6 +15,7 @@
 backend/view_app/__pycache__
 backend/backend/__pycache__
 backend/env/
+backend/video_data/video_data.json
 
 # misc
 .DS_Store
