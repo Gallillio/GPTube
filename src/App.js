@@ -254,15 +254,16 @@ function App() {
     return (
         <div className="App">
             <div className='left-section'>
-                <div>
+                <div className="left-section-top-part">
                     <img src={userProfilePicture} className='user-profile-picture' />
                     <hr />
                 </div>
+
                 <div className="left-section-lower-part">
                     <hr />
-                    {/* <div className='left-section-icons'>
-                        <span className='material-symbols-rounded left-section-icon-size' id="theme-btn"> light_mode </span> Light Mode
-                    </div> */}
+                    <div className='left-section-icons'>
+                        <span className='material-symbols-rounded left-section-icon-size' id="theme-btn"> upgrade </span> <span className='left-section-font'> Upgrade to Premium Plan </span>
+                    </div>
                     <div className='left-section-icons'>
                         <span className='material-symbols-rounded left-section-icon-size'> Settings </span> Settings
                     </div>
