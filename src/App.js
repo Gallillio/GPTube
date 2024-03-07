@@ -14,6 +14,7 @@ function App() {
     // Query to GPT Model
     const [input, setinput] = useState("");
     const [query, setQuery] = useState("");
+
     const [messages, setMessages] = useState([
         {
             text: "Hello, how may I assist you today ",
@@ -21,6 +22,82 @@ function App() {
         }
     ]);
     const rendered = useRef(0);
+
+    //handle sending messages section
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [GPT_response, setGPT_response] = useState("")
+    const [isInputDisabled, setIsInputDisabled] = useState(true)
+
+    useEffect(() => {
+        setIsInputDisabled(false);
+        if (rendered.current >= 2) {
+            // console.log("rendered q", query);
+            setMessages([
+                ...messages,
+                { text: query, isBot: false },
+                { text: GPT_response, isBot: true }
+            ]);
+            // console.log("res", GPT_response)
+            HandleTextToSpeech(GPT_response);
+            return;
+        }
+        rendered.current++;
+    }, [GPT_response])
+
+    useEffect(() => {
+        if (input !== "") { setQuery(input); }
+
+    }, [input])
+
+    const queryResponse = async () => {
+        setIsInputDisabled(true);
+
+        var user_query = input;
+        setQuery(user_query);
+        setinput("");
+
+        await fetch("http://127.0.0.1:8000/GetChatbotResponseAjax/?query=" + user_query)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setIsLoaded(true);
+                    setGPT_response(result.gpt_response)
+                    // console.log(result.gpt_response)
+                },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            )
+    }
+
+    const HandleSend = async () => {
+
+        if (input.trim().length !== 0) {
+            console.log("input ", input)
+            queryResponse();
+        } else {
+            console.log("Input field is empty")
+        }
+        // queryResponse();
+    }
+
+    const handleEnter = async (e) => {
+        if (e.key === "Enter") await HandleSend();
+    }
+
+    /// scroll down button start 
+    const chatContainerRef = useRef(null);
+    const scrollToBottom = () => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    })
 
     //Text to speech section
     const [isTextToSpeeching, setIsTextToSpeeching] = useState(false);
@@ -79,81 +156,7 @@ function App() {
                 }
             );
         }
-
     }
-
-    //handle sending messages section
-    const [error, setError] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [GPT_response, setGPT_response] = useState("")
-
-    const queryResponse = async () => {
-        // console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
-        setQuery(input);
-        setinput("");
-        await fetch("http://127.0.0.1:8000/GetChatbotResponseAjax/?query=" + query)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setIsLoaded(true);
-                    setGPT_response(result.gpt_response)
-                    console.log(result.use_scenario)
-                    // console.log(result.gpt_response)
-                },
-                (error) => {
-                    setIsLoaded(true);
-                    setError(error);
-                }
-            )
-    }
-
-    useEffect(() => {
-        if (rendered.current >= 2) {
-            // console.log("rendered q", query);
-            setMessages([
-                ...messages,
-                { text: query, isBot: false },
-                { text: GPT_response, isBot: true }
-            ]);
-            // console.log("res", GPT_response)
-            HandleTextToSpeech(GPT_response);
-            return;
-        }
-        rendered.current++;
-    }, [GPT_response])
-
-    useEffect(() => {
-        if (input !== "") { setQuery(input); }
-
-    }, [input])
-
-    const HandleSend = async () => {
-        // after successfully inputting query(input) by user
-        // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
-        // then play text to speech if button is enabled
-        if (input.trim().length !== 0) {
-            queryResponse();
-        } else {
-            console.log("Input field is empty")
-        }
-        // queryResponse();
-    }
-
-    const handleEnter = async (e) => {
-        if (e.key === "Enter") await HandleSend();
-    }
-
-    /// scroll down button start 
-    const chatContainerRef = useRef(null);
-    const scrollToBottom = () => {
-        if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    })
 
     // Speech to Text Section
     const [isListening, setIsListening] = useState(true);
@@ -165,6 +168,7 @@ function App() {
     const [RecTranscript, setRecTranscript] = useState("");
 
     useEffect(() => {
+        console.log("SHIIII")
         speechToTextConfig.current = sdk.SpeechConfig.fromSubscription(
             speechKey,
             speechRegion
@@ -182,7 +186,7 @@ function App() {
 
             if (result.reason === sdk.ResultReason.RecognizedSpeech) {
                 stopListening();
-                HandleSend();
+                // HandleSend();
 
                 const transcript = result.text;
                 console.log('Transcript: -->', transcript);
@@ -232,21 +236,25 @@ function App() {
                 setIsListening(false);
             });
         };
-    }, []);
+    }, [isListening]);
 
     const resumeListening = () => {
+        console.log(isListening)
+
         if (!isListening) {
             setIsListening(true);
             recognizer.current.startContinuousRecognitionAsync(() => {
-                // console.log('Resumed listening...');
+                console.log('Resumed listening...');
             });
         }
     };
 
     const stopListening = () => {
+        console.log(isListening)
+
         setIsListening(false);
         recognizer.current.stopContinuousRecognitionAsync(() => {
-            // console.log('Speech recognition stopped.');
+            console.log('Speech recognition stopped.');
         });
     };
 
@@ -298,10 +306,11 @@ function App() {
 
                 <div className='chatFooter center'>
                     <div className='inputText '>
-                        <textarea type='text' name='' id='chat-input' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} spellcheck="true" />
+                        <textarea type='text' disabled={isInputDisabled} name='' id='chat-input' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
+
                         {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
                         {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
-                        {/* <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button> */}
+
                         <button className='send material-symbols-rounded' onClick={HandleSend}> send </button>
 
                         {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
