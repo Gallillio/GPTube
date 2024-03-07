@@ -236,7 +236,7 @@ function App() {
                 setIsListening(false);
             });
         };
-    }, [isListening]);
+    }, []);
 
     const resumeListening = () => {
         console.log(isListening)
