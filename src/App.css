@@ -132,7 +132,7 @@
     align-self: center;
     font-size: 15px;
     width: 100%;
-    height: 84%;
+    height: 79%;
     padding: 7px;
     border-radius: 0.6rem 0 0.6rem;
 
@@ -218,3 +218,7 @@ textarea{
     justify-content: center;
 }
 
+.hover:hover{
+    background-color: #5b5e71;
+    border-radius: 50%;
+}
