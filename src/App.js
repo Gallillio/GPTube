@@ -251,6 +251,11 @@ function App() {
             // console.log('Speech recognition stopped.');
         });
     };
+
+    document.getElementById('chat-input').addEventListener('keyup', function () {
+        this.style.height = 0;
+        this.style.height = this.scrollHeight + 'px';
+        }, false);
     
     
 
@@ -303,12 +308,13 @@ function App() {
                     <div className='inputText '>
                         <textarea type='text' name='' id='chat-input'  placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} spellcheck="true" />
                         {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
-                        {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded hover '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop hover'> stop </button>}
+                        {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded hover '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop hover '> stop </button>}
                         {/* <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button> */}
-                        <button className='send material-symbols-rounded hover' onClick={HandleSend}> send </button>
+                        <button className='send material-symbols-rounded hover ' onClick={HandleSend}> send </button>
 
                         {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
-                        {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover'> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover'> volume_off </button>}
+                        {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover '> volume_off </button>}
+                   
                     </div>
                 </div>
             </div>

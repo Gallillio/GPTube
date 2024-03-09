@@ -147,6 +147,7 @@
     display: flex;
     margin-bottom: 5px;
     /* border-radius: 0.6rem; */
+    /* max-width: 1px; */
 }
 
 .bot{
@@ -184,6 +185,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative; /* Add this */
+
 }
 
 textarea{
@@ -222,3 +225,12 @@ textarea{
     background-color: #5b5e71;
     border-radius: 50%;
 }
+#chat-input{
+    position: absolute;
+    bottom:0;
+    left: 0;
+    overflow-y: hidden;
+    
+}
+
+
