@@ -261,6 +261,25 @@ function App() {
     const handleQuizScenarioAnswers = (e) => {
         e.preventDefault(); //prevents page from refreshing on submit
 
+        const quiz_scenario_data = new FormData(e.target);
+        const quiz_scenario_OBJECT = Object.fromEntries(quiz_scenario_data.entries());
+        const quiz_scenario_JSON = JSON.stringify(quiz_scenario_OBJECT);
+
+        // for (let key in quiz_scenario_JSON) {
+        //     // console.log(quiz_scenario_JSON[key]);
+        //     console.log(quiz_scenario_JSON);
+        // }
+
+        fetch("http://127.0.0.1:8000/GetQuizScenarioJSON/?quiz_scenario_user_answers=" + quiz_scenario_JSON)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result.quiz_scenario_user_answers_response)
+                },
+                (error) => {
+                    console.log("error fel quiz yasta")
+                }
+            )
     }
 
     return (
