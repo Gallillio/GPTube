@@ -98,11 +98,28 @@
 
 .scenario-section{
     height: 40%;
-    width: 100%;
+    width: 70%;
     border-radius: 20px;
     padding: 20px;
+    overflow: hidden;
+    overflow-y:scroll;
+    align-self: center;
 
     background-color: var(--outgoing-chat-bg);
+}
+
+.quiz-scenraio-box{
+    /* border: 3px solid red; */
+    margin-bottom: 1.5rem;
+    /* display: inline-block; */
+    /* word-wrap: break-word; */
+    /* overflow-x:scroll; */
+
+    /* float: left; */
+}
+
+.question-answers{
+    border: 3px solid lime;
 }
 
 .video-style{
@@ -135,7 +152,6 @@
     height: 84%;
     padding: 7px;
     border-radius: 0.6rem 0 0.6rem;
-
 }
 
 .user-profile-picture{

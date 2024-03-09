@@ -1,9 +1,9 @@
 import './App.css';
-import sendButton from './assets/send.svg';
 import userProfilePicture from './assets/user-icon.png';
 import gptImageLogo from './assets/chatgptLogo.svg'
 import React, { useState, useEffect, useRef } from 'react';
 import Video from './Video'; // Import MovieClip component
+import quizScenario from './quiz_scenario_JSON.json'
 
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
 
@@ -11,7 +11,7 @@ const speechKey = process.env.REACT_APP_SPEECH_KEY;
 const speechRegion = process.env.REACT_APP_SPEECH_REGION;
 
 function App() {
-    // Query to GPT Model
+    /// Query to GPT Model
     const [input, setinput] = useState("");
     const [query, setQuery] = useState("");
 
@@ -23,7 +23,7 @@ function App() {
     ]);
     const rendered = useRef(0);
 
-    //handle sending messages section
+    /// handle sending messages section
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [GPT_response, setGPT_response] = useState("")
@@ -99,7 +99,7 @@ function App() {
         scrollToBottom();
     })
 
-    //Text to speech section
+    /// Text to speech section
     const [isTextToSpeeching, setIsTextToSpeeching] = useState(false);
     const subscriptionKey = "b0f5184c6c2242f78356246fb06082f9";
     const serviceRegion = "eastus";
@@ -158,7 +158,7 @@ function App() {
         }
     }
 
-    // Speech to Text Section
+    /// Speech to Text Section
     const [isListening, setIsListening] = useState(true);
     const speechToTextConfig = useRef(null);
     const audioConfigSpeechToText = useRef(null);
@@ -168,7 +168,6 @@ function App() {
     const [RecTranscript, setRecTranscript] = useState("");
 
     useEffect(() => {
-        console.log("SHIIII")
         speechToTextConfig.current = sdk.SpeechConfig.fromSubscription(
             speechKey,
             speechRegion
@@ -258,12 +257,17 @@ function App() {
         });
     };
 
+    //Quiz scenario
+    const handleQuizScenarioAnswers = (e) => {
+        e.preventDefault(); //prevents page from refreshing on submit
+
+    }
 
     return (
         <div className="App">
             <div className='left-section'>
                 <div className="left-section-top-part">
-                    <img src={userProfilePicture} className='user-profile-picture' />
+                    <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
                     <hr />
                 </div>
 
@@ -285,8 +289,37 @@ function App() {
                     <Video />
                 </div>
                 <div className="scenario-section">
-                    <h3> scenario-section </h3>
-                    <button> Quiz scenario </button>
+                    <form onSubmit={handleQuizScenarioAnswers}>
+                        {quizScenario.map(item => {
+                            return (
+                                <div className='quiz-scenraio-box'>
+                                    <span><b> {item.question} </b></span>
+                                    {item.options.map(option => {
+                                        return (
+                                            <div>
+                                                {Object.keys(option).map(key => {
+                                                    return (
+                                                        <div>
+                                                            <input
+                                                                type="radio"
+                                                                id={item.question + key}
+                                                                name={item.question}
+                                                                value={key}
+                                                                required
+                                                            />
+                                                            <label for={item.question + key}> {option[key]} </label>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )
+                        })}
+
+                        <input type="submit" value="Get Results" />
+                    </form>
 
                 </div>
             </div>
