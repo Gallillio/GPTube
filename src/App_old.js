@@ -88,7 +88,6 @@ function App() {
   const [GPT_response, setGPT_response] = useState("")
 
   const queryResponse = async () => {
-    // console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
     setQuery(input);
     setinput("");
     await fetch("http://127.0.0.1:8000/GetChatbotResponseAjax/?query=" + query)
@@ -281,6 +280,7 @@ function App() {
         <div className='chatFooter cente'>
           <div className='inputText '>
             <input type='text' name='' id='' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
+            
             {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
             {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
             <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button>

@@ -1,9 +1,9 @@
 import './App.css';
-import sendButton from './assets/send.svg';
 import userProfilePicture from './assets/user-icon.png';
 import gptImageLogo from './assets/chatgptLogo.svg'
 import React, { useState, useEffect, useRef } from 'react';
 import Video from './Video'; // Import MovieClip component
+import quizScenario from './quiz_scenario_JSON.json'
 
 import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
 
@@ -11,9 +11,10 @@ const speechKey = process.env.REACT_APP_SPEECH_KEY;
 const speechRegion = process.env.REACT_APP_SPEECH_REGION;
 
 function App() {
-    // Query to GPT Model
+    /// Query to GPT Model
     const [input, setinput] = useState("");
     const [query, setQuery] = useState("");
+
     const [messages, setMessages] = useState([
         {
             text: "Hello, how may I assist you today ",
@@ -22,7 +23,83 @@ function App() {
     ]);
     const rendered = useRef(0);
 
-    //Text to speech section
+    /// handle sending messages section
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [GPT_response, setGPT_response] = useState("")
+    const [isInputDisabled, setIsInputDisabled] = useState(true)
+
+    useEffect(() => {
+        setIsInputDisabled(false);
+        if (rendered.current >= 2) {
+            // console.log("rendered q", query);
+            setMessages([
+                ...messages,
+                { text: query, isBot: false },
+                { text: GPT_response, isBot: true }
+            ]);
+            // console.log("res", GPT_response)
+            HandleTextToSpeech(GPT_response);
+            return;
+        }
+        rendered.current++;
+    }, [GPT_response])
+
+    useEffect(() => {
+        if (input !== "") { setQuery(input); }
+
+    }, [input])
+
+    const queryResponse = async () => {
+        setIsInputDisabled(true);
+
+        var user_query = input;
+        setQuery(user_query);
+        setinput("");
+
+        await fetch("http://127.0.0.1:8000/GetChatbotResponseAjax/?query=" + user_query)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setIsLoaded(true);
+                    setGPT_response(result.gpt_response)
+                    // console.log(result.gpt_response)
+                },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            )
+    }
+
+    const HandleSend = async () => {
+
+        if (input.trim().length !== 0) {
+            console.log("input ", input)
+            queryResponse();
+        } else {
+            console.log("Input field is empty")
+        }
+        // queryResponse();
+    }
+
+    const handleEnter = async (e) => {
+        if (e.key === "Enter") await HandleSend();
+    }
+
+    /// scroll down button start 
+    const chatContainerRef = useRef(null);
+    const scrollToBottom = () => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    })
+
+    /// Text to speech section
     const [isTextToSpeeching, setIsTextToSpeeching] = useState(false);
     const subscriptionKey = "b0f5184c6c2242f78356246fb06082f9";
     const serviceRegion = "eastus";
@@ -83,80 +160,7 @@ function App() {
     }
     
 
-    //handle sending messages section
-    const [error, setError] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [GPT_response, setGPT_response] = useState("")
-
-    const queryResponse = async () => {
-        // console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", input)
-        setQuery(input);
-        setinput("");
-        await fetch("http://127.0.0.1:8000/GetChatbotResponseAjax/?query=" + query)
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    setIsLoaded(true);
-                    setGPT_response(result.gpt_response)
-                    console.log(result.use_scenario)
-                    // console.log(result.gpt_response)
-                },
-                (error) => {
-                    setIsLoaded(true);
-                    setError(error);
-                }
-            )
-    }
-
-    useEffect(() => {
-        if (rendered.current >= 2) {
-            // console.log("rendered q", query);
-            setMessages([
-                ...messages,
-                { text: query, isBot: false },
-                { text: GPT_response, isBot: true }
-            ]);
-            // console.log("res", GPT_response)
-            HandleTextToSpeech(GPT_response);
-            return;
-        }
-        rendered.current++;
-    }, [GPT_response])
-
-    useEffect(() => {
-        if (input !== "") { setQuery(input); }
-
-    }, [input])
-
-    const HandleSend = async () => {
-        // after successfully inputting query(input) by user
-        // send the query to openai.js to get result from GPT using sendMessageToOpenAI()
-        // then play text to speech if button is enabled
-        if (input.trim().length !== 0) {
-            queryResponse();
-        } else {
-            console.log("Input field is empty")
-        }
-        // queryResponse();
-    }
-
-    const handleEnter = async (e) => {
-        if (e.key === "Enter") await HandleSend();
-    }
-
-    /// scroll down button start 
-    const chatContainerRef = useRef(null);
-    const scrollToBottom = () => {
-        if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    })
-
-    // Speech to Text Section
+    /// Speech to Text Section
     const [isListening, setIsListening] = useState(true);
     const speechToTextConfig = useRef(null);
     const audioConfigSpeechToText = useRef(null);
@@ -183,7 +187,7 @@ function App() {
 
             if (result.reason === sdk.ResultReason.RecognizedSpeech) {
                 stopListening();
-                HandleSend();
+                // HandleSend();
 
                 const transcript = result.text;
                 console.log('Transcript: -->', transcript);
@@ -236,19 +240,23 @@ function App() {
     }, []);
 
     const resumeListening = () => {
+        console.log(isListening)
+
         if (!isListening) {
             setIsListening(true);
             recognizer.current.startContinuousRecognitionAsync(() => {
-                // console.log('Resumed listening...');
+                console.log('Resumed listening...');
             });
         }
     };
     
 
     const stopListening = () => {
+        console.log(isListening)
+
         setIsListening(false);
         recognizer.current.stopContinuousRecognitionAsync(() => {
-            // console.log('Speech recognition stopped.');
+            console.log('Speech recognition stopped.');
         });
     };
 
@@ -258,12 +266,17 @@ function App() {
         }, false);
     
     
+    //Quiz scenario
+    const handleQuizScenarioAnswers = (e) => {
+        e.preventDefault(); //prevents page from refreshing on submit
+
+    }
 
     return (
         <div className="App">
             <div className='left-section'>
                 <div className="left-section-top-part">
-                    <img src={userProfilePicture} className='user-profile-picture' />
+                    <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
                     <hr />
                 </div>
 
@@ -285,8 +298,37 @@ function App() {
                     <Video />
                 </div>
                 <div className="scenario-section">
-                    <h3> scenario-section </h3>
-                    <button> Quiz scenario </button>
+                    <form onSubmit={handleQuizScenarioAnswers}>
+                        {quizScenario.map(item => {
+                            return (
+                                <div className='quiz-scenraio-box'>
+                                    <span><b> {item.question} </b></span>
+                                    {item.options.map(option => {
+                                        return (
+                                            <div>
+                                                {Object.keys(option).map(key => {
+                                                    return (
+                                                        <div>
+                                                            <input
+                                                                type="radio"
+                                                                id={item.question + key}
+                                                                name={item.question}
+                                                                value={key}
+                                                                required
+                                                            />
+                                                            <label for={item.question + key}> {option[key]} </label>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )
+                        })}
+
+                        <input type="submit" value="Get Results" />
+                    </form>
 
                 </div>
             </div>
@@ -306,11 +348,12 @@ function App() {
 
                 <div className='chatFooter center'>
                     <div className='inputText '>
-                        <textarea type='text' name='' id='chat-input'  placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} spellcheck="true" />
+                        <textarea type='text' disabled={isInputDisabled} name='' id='chat-input' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
+
                         {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
-                        {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded hover '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop hover '> stop </button>}
-                        {/* <button className='send' onClick={HandleSend}> <img src={sendButton} alt='Send Button' /> </button> */}
-                        <button className='send material-symbols-rounded hover ' onClick={HandleSend}> send </button>
+                        {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
+
+                        <button className='send material-symbols-rounded' onClick={HandleSend}> send </button>
 
                         {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
                         {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover '> volume_off </button>}
