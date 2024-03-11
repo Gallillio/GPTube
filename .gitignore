@@ -41,3 +41,4 @@ backend/view_app/migrations/__pycache__/0002_books.cpython-311.pyc
 backend/view_app/migrations/__pycache__/0003_delete_books_delete_react.cpython-311.pyc
 backend/view_app/migrations/__pycache__/0004_initial.cpython-311.pyc
 backend/view_app/migrations/__pycache__/__init__.cpython-311.pyc
+*.sqlite3
