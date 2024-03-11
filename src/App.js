@@ -27,6 +27,7 @@ function App() {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [GPT_response, setGPT_response] = useState("")
+    const [quiz, setQuiz] = useState("")
     const [isInputDisabled, setIsInputDisabled] = useState(true)
 
     useEffect(() => {
@@ -66,7 +67,8 @@ function App() {
                 (result) => {
                     setIsLoaded(true);
                     setGPT_response(result.gpt_response)
-                    // console.log(result.gpt_response)
+                    setQuiz(result.quiz)
+                    console.log(result.quiz)
                 },
                 (error) => {
                     setIsLoaded(true);

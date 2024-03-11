@@ -37,9 +37,9 @@ def GetChatbotResponseAjax(request):
 
         print("Stopped Time wohooo:", stopped_time)
         
-        gpt_response, use_scenario = GetChatboxResponse(query, videoId, stopped_time)
+        gpt_response, use_scenario, Quiz = GetChatboxResponse(query, videoId, stopped_time)
 
-        return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId})
+        return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId, "quiz": Quiz})
     else:
         return JsonResponse({'gpt_response': "Method not allowed"}, status=405)
 
