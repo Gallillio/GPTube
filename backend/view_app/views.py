@@ -77,21 +77,46 @@ def GetTimeAndID(request):
 
 ### SCENARIOS ###
 def GetQuizScenarioJSON(request):
+    
     if request.method == 'GET':
+    # To get the correct answers
+        with open('quiz_scenario_JSON.json', 'r') as file:
+            data = json.load(file)
+        
+        # To get the user answers
         quiz_scenario_user_answers_string = request.GET.get('quiz_scenario_user_answers')
         quiz_scenario_user_answers_JSON = json.loads(quiz_scenario_user_answers_string)
-        print("\n\n\n ",quiz_scenario_user_answers_JSON, "\n\n\n")
+        
+        # Extract choices and questions
+        choices = [item.get('options') for item in data]
+        questions = [item.get('question') for item in data]
+        
+        # Printing for debugging
+        print("\nUser Answers JSON: ", quiz_scenario_user_answers_JSON)
 
-        keys = quiz_scenario_user_answers_JSON.keys()
-        values = quiz_scenario_user_answers_JSON.values()
-        # print("KEYS: \n", keys, "\n\n")
-        # print("VALUEES: \n", values, "\n\n")
+        # Compare user answers with correct answers and save details of wrong answers
+        wrong_answers = []
+        for user_ans, correct_ans, question, choice in zip(quiz_scenario_user_answers_JSON.values(), 
+                                                        [item.get('answer') for item in data], 
+                                                        questions, 
+                                                        choices):
+            if user_ans != correct_ans:
+                wrong_answers.append({
+                    'question': question,
+                    'user_answer': user_ans,
+                    'correct_answer': correct_ans,
+                    'choices': choice,
+                })
 
-        for key in keys:
-            print("VALUES USING KEY: \n", quiz_scenario_user_answers_JSON[key] ,"\n")
+        # Provide feedback or take further actions based on wrong_answers
+        if not wrong_answers:
+            response_message = "Congratulations! All answers are correct."
+        else:
+            response_message = f"You got {len(data) - len(wrong_answers)} out of {len(data)} answers correct. Here are the details of your wrong answers:"
+            for wrong_answer in wrong_answers:
+                response_message += f"\n\nQuestion: {wrong_answer['question']}\nYour Answer: {wrong_answer['user_answer']}\nCorrect Answer: {wrong_answer['correct_answer']}\nChoices: {wrong_answer['choices']}"
 
-        return JsonResponse({"quiz_scenario_user_answers_response": "great work, it worked, go check views.py to actually make it work you dumb fuk"})
-
+        return JsonResponse({"quiz_scenario_user_answers_response": response_message})
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))
 # stopped_time = time_and_id_response.get('Stopped_Time', stopped_time)
 # video_id = time_and_id_response.get('Video_ID', video_id)
