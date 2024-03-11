@@ -15,35 +15,31 @@ def UseScenarioOrChatbotResponse(request):
 
     if request.method == 'GET':
         query = request.GET.get('query')
+        videoId = request.GET.get('videoId')
 
 def GetChatbotResponseAjax(request):
     # Connect to Azure OpenAI 
     ConnectToAzure()
     
-    global stopped_time, video_id
-    stopped_time = None  # Initialize stopped_time
-    video_id = None  # Initialize video_id
-    
     if request.method == 'GET':
         query = request.GET.get('query')
-        
+        videoId = request.GET.get('videoId')
+        stopped_time = None
         # Attempt to read stopped_time and video_id from file
         try:
             with open("video_data/video_data.json", "r") as f:
                 data = json.load(f)
             stopped_time = data.get('Stopped_Time', stopped_time)
-            video_id = data.get('Video_ID', video_id)
         except FileNotFoundError:
             pass  # File doesn't exist yet
         except Exception as e:
             return JsonResponse({'gpt_response': "Error occurred: " + str(e)}, status=500)
 
         print("Stopped Time wohooo:", stopped_time)
-        print("Video ID wohooo:", video_id)
         
-        gpt_response, use_scenario = GetChatboxResponse(query, video_id, stopped_time)
+        gpt_response, use_scenario = GetChatboxResponse(query, videoId, stopped_time)
 
-        return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario})
+        return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId})
     else:
         return JsonResponse({'gpt_response': "Method not allowed"}, status=405)
 
@@ -58,7 +54,7 @@ def GetTimeAndID(request):
         print("Video ID:", video_id)
 
         # Save stopped_time and video_id to a file
-        data = {"Stopped_Time": stopped_time, "Video_ID": video_id}
+        data = {"Stopped_Time": stopped_time}
         with open("video_data/video_data.json", "w") as f:
             json.dump(data, f)
 

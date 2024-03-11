@@ -57,7 +57,10 @@ function App() {
         setQuery(user_query);
         setinput("");
 
-        await fetch("http://127.0.0.1:8000/GetChatbotResponseAjax/?query=" + user_query)
+        const SrcSplit = document.querySelector('.video-style').src.split('/')
+        const videoId = SrcSplit[SrcSplit.length - 1].split('?')[0]
+        console.log('videoId: ', videoId);
+        await fetch(`http://127.0.0.1:8000/GetChatbotResponseAjax/?query=${user_query}&videoId=${videoId}`)
             .then(res => res.json())
             .then(
                 (result) => {
@@ -260,10 +263,10 @@ function App() {
         });
     };
 
-    document.getElementById('chat-input').addEventListener('keyup', function () {
-        this.style.height = 0;
-        this.style.height = this.scrollHeight + 'px';
-        }, false);
+    // document.getElementById('chat-input').addEventListener('keyup', function () {
+    //     this.style.height = 0;
+    //     this.style.height = this.scrollHeight + 'px';
+        // }, false);
     
     
     //Quiz scenario

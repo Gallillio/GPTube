@@ -2,7 +2,7 @@
 import YouTube from "react-youtube";
 import React from 'react';
 
-class MovieClip extends React.Component {
+class Video extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -57,10 +57,10 @@ class MovieClip extends React.Component {
       <div>
         <YouTube videoId="IX0iGf2wYM0" opts={options} onPause={this._onPause} iframeClassName={"video-style"} />
         {/* You can display the stopped time if needed */}
-        {this.state.stoppedTime && <p>Video stopped at: {this.state.stoppedTime}</p>}
+        {/* {this.state.stoppedTime && <p>Video stopped at: {this.state.stoppedTime}</p>} */}
       </div>
     );
   }
 }
 
-export default MovieClip;
+export default Video;

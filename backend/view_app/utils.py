@@ -17,8 +17,8 @@ from langchain.docstore import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.agents import initialize_agent, load_tools, AgentType, Tool, AgentExecutor, Tool, ZeroShotAgent, create_structured_chat_agent
-from langchain.memory import ConversationBufferMemory, VectorStoreRetrieverMemory
-from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferMemory, VectorStoreRetrieverMemory, ConversationSummaryBufferMemory
+from langchain.chains import ConversationChain, LLMChain
 from langchain.prompts import MessagesPlaceholder
 from langchain.tools import BaseTool
 
@@ -76,43 +76,52 @@ def MemoryWithVectorStore():
     retriever = vectorstore.as_retriever(search_kwargs=dict(k=4))
     return VectorStoreRetrieverMemory(retriever=retriever)
 
+def SummarizationMemory():
+    model = ConnectToAzure()
+    return ConversationSummaryBufferMemory(llm=model, max_token_limit=1000, memory_key="history",  input_key='input')
+
 def ConversationChainWithMemory(video_data, stopped_time):
-    _DEFAULT_TEMPLATE = """The following is a friendly conversation between a human and an AI. The AI is talkative and provides lots of specific details from its context. If the AI does not know the answer to a question, it truthfully says it does not know.
-    You're an AI Video Chat that helps people with anything they don't understand in the video given a transcript and stopped time
-    Respond to the human as a professional bot and don't mention transcript word or something like this, we're here in a backend
-    As an example:    Human: can you illustrate the last five mins
-    AI: --respond here from the transcript and given time 
+    _DEFAULT_TEMPLATE = """
+    You're an AI video chat that helps people with anything they don't understand in the video using the below transcript and stopped time.
+    Respond to the human as a professional bot and don't mention 'transcript' word or something like this, we're here in a backend.,
+    but if the question or what he said is normal like hello or telling his name (talking like a friend) respond normally as an AI.
+    Any questions that you can respond as an AI, Don't hesitate to respond.
+    Respond to anything related to the video as illustration, summarization and generating questions from the video.
     
-    Relevant pieces of previous conversation:
+    Video Stopped time: ///{stopped_time}///
+    This Video stopped time is used if the user asked to illustrate or summarize the last minute before the stopped time or summarize the after. 
+    
+    Video Transcript: ""{given_data}""
+
+    (Video Transcript is a given transcript of a video, it is given as a text format including a 
+    (the text itself - startime of a specific text - duration of this specific text) 
+    Use the start time to know from the stopped time of the video where is the specific time the user talking about and 
+    responding with data relevant to that time like if he asked to illustrate last 5 mins)
+    
+    History of the conversation:
     {history}
-
-    (You do not need to use these pieces of information if not relevant)
-
-    Video Stopped time: {stopped_time}
-    Given Data: {given_data}
-
-    (This is a given transcript of a video, it is given as a json format including a (startime of a specific text - duration of this specific text - the text itself) )
+    
     Current conversation:
-    Human: {input}
-    AI:"""
-    PROMPT = PromptTemplate(
-        input_variables=["history", "input"], 
-        template=_DEFAULT_TEMPLATE,
-        partial_variables = {'given_data': video_data, 'stopped_time': stopped_time}
+    New human question: {input}
+    Response:"""
+
+    prompt = PromptTemplate(
+        input_variables=["history", "input", "stopped_time", 'given_data'], template=_DEFAULT_TEMPLATE
     )
-    conversation = ConversationChain(
-    llm = ConnectToAzure(),
-    prompt =  PROMPT,
-    memory = MemoryWithVectorStore(),
-    verbose = False
-)
+
+    conversation = LLMChain(
+    llm=ConnectToAzure(),
+    prompt=prompt,
+    verbose=True,
+    memory=SummarizationMemory(),
+    )
     return conversation
 
 def UseScenarioOrChatbot():
     # query = test me on this subject
     ...
 
-def get_video_data(csv_file, video_id):
+def get_video_data_txt(csv_file, video_id):
     """
     Function to read a CSV file and retrieve text data along with start and duration for a given video_id.
 
@@ -121,7 +130,7 @@ def get_video_data(csv_file, video_id):
     video_id (str): ID of the video to retrieve data for.
 
     Returns:
-    str: JSON formatted string containing text data, start, and duration for the given video_id.
+    str: String containing the transcript data formatted as text, start, and duration.
     """
     try:
         # Read the CSV file into a DataFrame
@@ -130,22 +139,24 @@ def get_video_data(csv_file, video_id):
         # Filter the DataFrame to get data for the given video_id
         video_data = df[df['video_id'] == video_id]
 
-        # Extract text, start, and duration data
-        video_text_data = [{"text": row['text'], "start": row['start'], "duration": row['duration']} for index, row in video_data.iterrows()]
+        # Initialize a string to hold the transcript data
+        transcript_data = f"Transcript of Video ID: {video_id}\n\n"
 
-        # Convert the extracted data to JSON format
-        json_data = json.dumps(video_text_data, indent=4)
+        # Iterate over the rows and append each entry as text, start, and duration
+        for index, row in video_data.iterrows():
+            transcript_data += f"Text: {row['text']}\n"
+            transcript_data += f"Start: {row['start']}\n"
+            transcript_data += f"Duration: {row['duration']}\n\n"
 
-        return json_data
-
+        return transcript_data
+    
     except FileNotFoundError:
         print(f"Error: File '{csv_file}' not found.")
-        return None
+        return ""
     except Exception as e:
         print(f"An error occurred: {str(e)}")
-        return None
-    
-
+        return ""
+   
 def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
     """
     Takes user_query and returns chatgpt response
@@ -153,15 +164,21 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
     parameter:
         user_input: query user enters
     """
-    use_scenario = False
-    global conversation
+    if user_input and video_id and stopped_time:
 
-    if conversation is None:
-        csv_file = "videos_transcript.csv"
-        video_data_json = get_video_data(csv_file, video_id)
-        conversation = ConversationChainWithMemory(video_data_json, stopped_time)
+        use_scenario = False
+        global conversation
+        csv_file = "video_data/videos_transcript.csv"
+        video_data = get_video_data_txt(csv_file, video_id)
+        
+        if conversation is None:
+            conversation = ConversationChainWithMemory(video_data, stopped_time)
+            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = video_data), use_scenario   
+        else:
+            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = video_data), use_scenario
+    
 
-    return conversation.predict(input = user_input), use_scenario   
+            
 
 #response, user = GetChatboxResponse(user_input = 'Illustrate the last 60 seconds', video_id = '-9TdpdjDtAM', stopped_time = '90')
 #print(f'Response = {response}')
