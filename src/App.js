@@ -161,7 +161,7 @@ function App() {
         }
 
     }
-    
+
 
     /// Speech to Text Section
     const [isListening, setIsListening] = useState(true);
@@ -252,7 +252,7 @@ function App() {
             });
         }
     };
-    
+
 
     const stopListening = () => {
         console.log(isListening)
@@ -263,12 +263,19 @@ function App() {
         });
     };
 
+    /// increase input chat size
+    const chatInputRef = useRef(null);
+    useEffect(() => {
+        chatInputRef.current.style.height = "auto";
+        chatInputRef.current.style.height = chatInputRef.current.scrollHeight + "px";
+    }, [input])
+
     // document.getElementById('chat-input').addEventListener('keyup', function () {
     //     this.style.height = 0;
     //     this.style.height = this.scrollHeight + 'px';
-        // }, false);
-    
-    
+    // }, false);
+
+
     //Quiz scenario
     const handleQuizScenarioAnswers = (e) => {
         e.preventDefault(); //prevents page from refreshing on submit
@@ -351,7 +358,7 @@ function App() {
 
                 <div className='chatFooter center'>
                     <div className='inputText '>
-                        <textarea type='text' disabled={isInputDisabled} name='' id='chat-input' placeholder='Send Message' value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} />
+                        <textarea type='text' disabled={isInputDisabled} name='' id='chat-input' placeholder='Send Message' rows={"1"} value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} ref={chatInputRef} />
 
                         {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
                         {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
@@ -359,9 +366,9 @@ function App() {
                         <button className='send material-symbols-rounded' onClick={HandleSend}> send </button>
 
                         {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
-                        {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover '> volume_off </button>}
-                   
+                        {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover'> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover '> volume_off </button>}
                     </div>
+                    <button> quiz scenario </button>
                 </div>
             </div>
         </div>
