@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
-from .utils import ConnectToAzure, GetChatboxResponse
+from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson
 from django.http import JsonResponse
 from django.core.cache import cache
 import json
@@ -15,39 +15,33 @@ def UseScenarioOrChatbotResponse(request):
 
     if request.method == 'GET':
         query = request.GET.get('query')
-
+        videoId = request.GET.get('videoId')
 
 def GetChatbotResponseAjax(request):
     # Connect to Azure OpenAI 
     ConnectToAzure()
-    global stopped_time, video_id
-    stopped_time = None  # Initialize stopped_time
-    video_id = None  # Initialize video_id
     
     if request.method == 'GET':
         query = request.GET.get('query')
-        
+        videoId = request.GET.get('videoId')
+        stopped_time = None
         # Attempt to read stopped_time and video_id from file
         try:
             with open("video_data/video_data.json", "r") as f:
                 data = json.load(f)
             stopped_time = data.get('Stopped_Time', stopped_time)
-            video_id = data.get('Video_ID', video_id)
         except FileNotFoundError:
             pass  # File doesn't exist yet
         except Exception as e:
             return JsonResponse({'gpt_response': "Error occurred: " + str(e)}, status=500)
 
         print("Stopped Time wohooo:", stopped_time)
-        print("Video ID wohooo:", video_id)
         
-        gpt_response, use_scenario = GetChatboxResponse(query, video_id, stopped_time)
+        gpt_response, use_scenario = GetChatboxResponse(query, videoId, stopped_time)
 
-        return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario})
+        return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId})
     else:
         return JsonResponse({'gpt_response': "Method not allowed"}, status=405)
-
-
 
 def GetTimeAndID(request):
     if request.method == 'GET':
@@ -61,7 +55,7 @@ def GetTimeAndID(request):
 
         # Save stopped_time and video_id to a file
         data = {"Stopped_Time": stopped_time, "Video_ID": video_id}
-        with open("video_data/video_data.json", "w") as f:
+        with open("video_data.json", "w") as f:
             json.dump(data, f)
 
         # You can return a JSON response confirming the receipt of data
@@ -77,6 +71,16 @@ def GetTimeAndID(request):
         except Exception as e:
             return JsonResponse({'Stopped_Time': "Error occurred: " + str(e)}, status=500)
 
+### SCENARIOS ###
+def GetGenerateQuizJson(request):
+    csv_file = "video_data/videos_transcript.csv"
+    if request.method == 'GET':
+        video_id = request.GET.get('videoId')
+        Quiz = GenerateQuizJson(video_id, csv_file)
+
+        return JsonResponse({"quiz": Quiz})
+        
+        
 
 
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))

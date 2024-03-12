@@ -1,7 +1,8 @@
-import React from "react";
+// import React from "react";
 import YouTube from "react-youtube";
+import React from 'react';
 
-class MovieClip extends React.Component {
+class Video extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,7 +17,7 @@ class MovieClip extends React.Component {
     this.setState({ stoppedTime });
     // Log the stopped time to the console
     console.log("Video stopped at:", stoppedTime);
-    
+
     // Send stopped time and video ID to backend
     const videoId = event.target.getVideoData().video_id;
     this.sendStoppedTimeToBackend(stoppedTime, videoId);
@@ -25,7 +26,7 @@ class MovieClip extends React.Component {
   sendStoppedTimeToBackend(stoppedTime, videoId) {
     // Make a GET request to your backend API
     fetch(`http://127.0.0.1:8000/GetTimeAndID/?stoppedTime=${stoppedTime}&videoId=${videoId}`)
-    .then(response => {
+      .then(response => {
         if (response.ok) {
           console.log('Data received successfully');
         } else {
@@ -37,24 +38,29 @@ class MovieClip extends React.Component {
       });
   }
 
+  // stopVideo = (event) => {
+  //   event.target.pauseVideo();
+  // };
+
   render() {
     const options = {
-      height: '390',
-      width: '640',
+      //height and width now set in css
+      // height: '1', // 390 original size
+      // width: '1', // 640 original size
       playerVars: {
-        autoplay: 1,
+        autoplay: 0,
         controls: 1,
       },
     };
 
     return (
-      <div className="video-div">
-        <YouTube videoId="-9TdpdjDtAM" options={options} onPause={this._onPause} />
+      <div>
+        <YouTube videoId="IX0iGf2wYM0" opts={options} onPause={this._onPause} iframeClassName={"video-style"} />
         {/* You can display the stopped time if needed */}
-        {this.state.stoppedTime && <p>Video stopped at: {this.state.stoppedTime}</p>}
+        {/* {this.state.stoppedTime && <p>Video stopped at: {this.state.stoppedTime}</p>} */}
       </div>
     );
   }
 }
 
-export default MovieClip;
+export default Video;
