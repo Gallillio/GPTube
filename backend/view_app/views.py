@@ -92,8 +92,9 @@ def GetQuizScenarioJSON(request):
         questions = [item.get('question') for item in data]
         
         # Printing for debugging
-        print("\nUser Answers JSON: ", quiz_scenario_user_answers_JSON)
-
+        # print("\nUser Answers JSON: ", quiz_scenario_user_answers_JSON)
+        # print("keys",quiz_scenario_user_answers_JSON.key())
+        # print("vals")
         # Compare user answers with correct answers and save details of wrong answers
         wrong_answers = []
         for user_ans, correct_ans, question, choice in zip(quiz_scenario_user_answers_JSON.values(), 
