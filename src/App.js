@@ -140,12 +140,8 @@ function App() {
                 function (result) {
                     if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
                         console.log("Done");
-                        // resultDiv.innerHTML += "synthesis finished for [" + response + "].\n";
-                        // console.log("synthesis finished for [" + response + "].\n");
                     } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
                         console.log("cancelled");
-                        // resultDiv.innerHTML += "synthesis failed. Error detail: " + result.errorDetails + "\n";
-                        // console.log("synthesis failed. Error detail: " + result.errorDetails + "\n");
 
                     }
                     // window.console.log(result);
@@ -253,7 +249,6 @@ function App() {
         }
     };
 
-
     const stopListening = () => {
         console.log(isListening)
 
@@ -270,13 +265,21 @@ function App() {
         chatInputRef.current.style.height = chatInputRef.current.scrollHeight + "px";
     }, [input])
 
-    // document.getElementById('chat-input').addEventListener('keyup', function () {
-    //     this.style.height = 0;
-    //     this.style.height = this.scrollHeight + 'px';
-    // }, false);
-
-
     //Quiz scenario
+    const handleGenerateQuizScenario = () => {
+        const SrcSplit = document.querySelector('.video-style').src.split('/')
+        const videoId = SrcSplit[SrcSplit.length - 1].split('?')[0]
+        fetch(`http://127.0.0.1:8000/GetGenerateQuizJson/?videoId=${videoId}`)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result.quiz)
+                },
+                (error) => {
+                    console.log("handle generate quiz aint working you dumb fu")
+                }
+            )
+    }
     const handleQuizScenarioAnswers = (e) => {
         e.preventDefault(); //prevents page from refreshing on submit
 
@@ -368,7 +371,7 @@ function App() {
                         {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
                         {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover'> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover '> volume_off </button>}
                     </div>
-                    <button> quiz scenario </button>
+                    <button onClick={handleGenerateQuizScenario}> quiz scenario </button>
                 </div>
             </div>
         </div>

@@ -78,7 +78,6 @@ def GetGenerateQuizJson(request):
         video_id = request.GET.get('videoId')
         Quiz = GenerateQuizJson(video_id, csv_file)
 
-        print("\n\n\n ", Quiz)
         return JsonResponse({"quiz": Quiz})
         
         
