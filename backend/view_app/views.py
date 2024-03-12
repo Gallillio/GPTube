@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
-from .utils import ConnectToAzure, GetChatboxResponse
+from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson
 from django.http import JsonResponse
 from django.core.cache import cache
 import json
@@ -70,6 +70,18 @@ def GetTimeAndID(request):
             return JsonResponse({'Stopped_Time': None, 'Video_ID': None})
         except Exception as e:
             return JsonResponse({'Stopped_Time': "Error occurred: " + str(e)}, status=500)
+
+### SCENARIOS ###
+def GetGenerateQuizJson(request):
+    csv_file = "video_data/videos_transcript.csv"
+    if request.method == 'GET':
+        video_id = request.GET.get('videoId')
+        Quiz = GenerateQuizJson(video_id, csv_file)
+
+        print("\n\n\n ", Quiz)
+        return JsonResponse({"quiz": Quiz})
+        
+        
 
 
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))

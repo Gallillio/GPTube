@@ -4,6 +4,7 @@ calculate or do a specific thing that dont necessirly
 handle any HTTP requests or anything related to views
 """
 #imports
+#imports
 import openai
 import json
 import pandas as pd
@@ -15,10 +16,12 @@ from langchain.chat_models import AzureChatOpenAI
 from langchain_openai import AzureOpenAIEmbeddings
 from langchain.docstore import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
-from langchain.prompts import PromptTemplate
+from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.agents import initialize_agent, load_tools, AgentType, Tool, AgentExecutor, Tool, ZeroShotAgent, create_structured_chat_agent
 from langchain.memory import ConversationBufferMemory, VectorStoreRetrieverMemory, ConversationSummaryBufferMemory
 from langchain.chains import ConversationChain, LLMChain
+from langchain_core.output_parsers import JsonOutputParser
+from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain.prompts import MessagesPlaceholder
 from langchain.tools import BaseTool
 
@@ -156,7 +159,105 @@ def get_video_data_txt(csv_file, video_id):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return ""
-   
+
+def GenerateQuizJson(video_id, csv_file):
+    question_schema = ResponseSchema(name="question",
+                             description="The question")
+    options_schema = ResponseSchema(name="options",
+                                      description="A dictionary that contains A, B, C, D")
+    answer_schema = ResponseSchema(name="answer",
+                                    description="The answer of the question")
+
+    response_schemas = [question_schema, 
+                        options_schema,
+                        answer_schema]
+    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+    format_instructions = '''[
+  {
+    "question": "1. What is supervised machine learning?",
+    "options": [
+      {
+        "A": "A. A type of learning where the model learns from labeled data.",
+        "B": "B. A type of learning where the model learns from unlabeled data.",
+        "C": "C. A type of learning where the model learns from reinforcement.",
+        "D": "D. A type of learning where the model learns from semi-labeled data."
+      }
+    ],
+    "answer": "A"
+  },
+  {
+    "question": "2. Which of the following is an example of supervised learning algorithm?",
+    "options": [
+      {
+        "A": "A. K-Means clustering",
+        "B": "B. Decision tree",
+        "C": "C. K-Nearest Neighbors",
+        "D": "D. Apriori algorithm"
+      }
+    ],
+    "answer": "B"
+  },
+  {
+    "question": "3. What is the primary goal of supervised learning?",
+    "options": [
+      {
+        "A": "A. To minimize error on the training data.",
+        "B": "B. To maximize accuracy on the test data.",
+        "C": "C. To generalize well on unseen data.",
+        "D": "D. To memorize the training data."
+      }
+    ],
+    "answer": "C"
+  },
+  {
+    "question": "4. Which of the following tasks is NOT typically performed in supervised learning?",
+    "options": [
+      {
+        "A": "A. Classification",
+        "B": "B. Clustering",
+        "C": "C. Regression",
+        "D": "D. Anomaly detection"
+      }
+    ],
+    "answer": "B"
+  },
+  {
+    "question": "5. What is the process of supervised learning?",
+    "options": [
+      {
+        "A": "A. Feature engineering, model selection, training, evaluation",
+        "B": "B. Data collection, feature selection, training, deployment",
+        "C": "C. Data preprocessing, model training, testing, deployment",
+        "D": "D. Feature extraction, model validation, testing, deployment"
+      }
+    ],
+    "answer": "C"
+  }
+]
+  '''
+    quiz_template = """\
+    From the Transcript, generate 5 MCQ questions:
+
+    The output should be formatted as the following schema:
+
+    {format_instructions}
+
+
+    text: {text}
+    """
+    video_data = get_video_data_txt(csv_file, video_id)
+    prompt = ChatPromptTemplate.from_template(template=quiz_template)
+    messages = prompt.format_messages(text=video_data, 
+                                format_instructions=format_instructions)
+    chat = ConnectToAzure()
+    quiz = chat(messages)
+    parser = JsonOutputParser()
+    quiz_dict = parser.parse(quiz.content)
+    file_name = "./../src/quiz_scenario_JSON.json"
+    with open(file_name, 'w') as json_file:
+        json.dump(quiz_dict, json_file)
+    return quiz_dict
+
 def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
     """
     Takes user_query and returns chatgpt response
