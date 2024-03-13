@@ -281,9 +281,29 @@ function App() {
             )
     }
     const handleQuizScenarioAnswers = (e) => {
-        e.preventDefault(); //prevents page from refreshing on submit
+        e.preventDefault(); // prevents page from refreshing on submit
 
-    }
+        const quiz_scenario_data = new FormData(e.target);
+        const quiz_scenario_OBJECT = Object.fromEntries(quiz_scenario_data.entries());
+        const quiz_scenario_JSON = JSON.stringify(quiz_scenario_OBJECT);
+
+        fetch("http://127.0.0.1:8000/GetQuizAnswers/?quiz_scenario_user_answers=" + quiz_scenario_JSON)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result.quiz_scenario_user_answers_response);
+
+                    setMessages([
+                        ...messages,
+                        { text: result.quiz_scenario_user_answers_response, isBot: true },
+                    ]);
+                },
+                (error) => {
+                    console.log("error fel quiz yasta");
+                }
+            );
+    };
+
 
     return (
         <div className="App">
@@ -364,9 +384,9 @@ function App() {
                         <textarea type='text' disabled={isInputDisabled} name='' id='chat-input' placeholder='Send Message' rows={"1"} value={input} onKeyDown={handleEnter} onChange={(e) => { setinput(e.target.value) }} ref={chatInputRef} />
 
                         {/* if mic is on, replace the turn mic on with turn mic off, and vice versa */}
-                        {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded '> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop'> stop </button>}
+                        {!isListening ? <button onClick={resumeListening} className='send material-symbols-rounded hover'> mic </button> : <button onClick={stopListening} className=' send material-symbols-rounded stop hover'> stop </button>}
 
-                        <button className='send material-symbols-rounded' onClick={HandleSend}> send </button>
+                        <button className='send material-symbols-rounded hover' onClick={HandleSend}> send </button>
 
                         {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
                         {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover'> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover '> volume_off </button>}

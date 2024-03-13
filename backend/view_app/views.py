@@ -33,7 +33,7 @@ def GetChatbotResponseAjax(request):
         except FileNotFoundError:
             pass  # File doesn't exist yet
         except Exception as e:
-            return JsonResponse({'gpt_response': "Error occurred: " + str(e)}, status=500)
+            return JsonResponse({"gpt_response": "Error occurred: " + str(e)}, status=500)
 
         print("Stopped Time wohooo:", stopped_time)
         
@@ -41,7 +41,7 @@ def GetChatbotResponseAjax(request):
 
         return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId})
     else:
-        return JsonResponse({'gpt_response': "Method not allowed"}, status=405)
+        return JsonResponse({"gpt_response": "Method not allowed"}, status=405)
 
 def GetTimeAndID(request):
     if request.method == 'GET':
@@ -79,10 +79,50 @@ def GetGenerateQuizJson(request):
         Quiz = GenerateQuizJson(video_id, csv_file)
 
         return JsonResponse({"quiz": Quiz})
+    
+def GetQuizAnswers(request):
+    if request.method == 'GET':
+    # To get the correct answers
+        with open('quiz_scenario_JSON.json', 'r') as file:
+            data = json.load(file)
         
+        # To get the user answers
+        quiz_scenario_user_answers_string = request.GET.get('quiz_scenario_user_answers')
+        quiz_scenario_user_answers_JSON = json.loads(quiz_scenario_user_answers_string)
         
+        # Extract choices and questions
+        choices = [item.get('options') for item in data]
+        questions = [item.get('question') for item in data]
+        
+        # Printing for debugging
+        # print("\nUser Answers JSON: ", quiz_scenario_user_answers_JSON)
+        # print("keys",quiz_scenario_user_answers_JSON.key())
+        # print("vals")
 
+        # Compare user answers with correct answers and save details of wrong answers
+        wrong_answers = []
+        for user_ans, correct_ans, question, choice in zip(quiz_scenario_user_answers_JSON.values(), 
+                                                        [item.get('answer') for item in data], 
+                                                        questions, 
+                                                        choices):
+            if user_ans != correct_ans:
+                wrong_answers.append({
+                    'question': question,
+                    'user_answer': user_ans,
+                    'correct_answer': correct_ans,
+                    'choices': choice,
+                })
 
+        # Provide feedback or take further actions based on wrong_answers
+        if not wrong_answers:
+            response_message = "Congratulations! All answers are correct."
+        else:
+            response_message = f"You got {len(data) - len(wrong_answers)} out of {len(data)} answers correct. Here are the details of your wrong answers:"
+            for wrong_answer in wrong_answers:
+                response_message += f"\n\n Question: {wrong_answer['question']}\n Your Answer: {wrong_answer['user_answer']}\nCorrect Answer: {wrong_answer['correct_answer']}\nChoices: {wrong_answer['choices']}"
+
+        return JsonResponse({"quiz_scenario_user_answers_response": response_message})
+    
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))
 # stopped_time = time_and_id_response.get('Stopped_Time', stopped_time)
 # video_id = time_and_id_response.get('Video_ID', video_id)
