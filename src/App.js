@@ -158,7 +158,7 @@ function App() {
         }
 
     }
-    
+
 
     /// Speech to Text Section
     const [isListening, setIsListening] = useState(true);
@@ -249,7 +249,7 @@ function App() {
             });
         }
     };
-    
+
 
     const stopListening = () => {
         console.log(isListening)
@@ -264,40 +264,40 @@ function App() {
     //     this.style.height = 0;
     //     this.style.height = this.scrollHeight + 'px';
     //     }, false);
-    
+
     // const handleChatbotResponse = (quizResponse) => {
     //     // Your logic to interact with the chatbot based on the quiz response
     //     // This could involve updating the state or triggering chatbot messages
     //     // console.log("Handling quiz response in chatbot:", quizResponse);
-    
+
     //     // Example: Assuming you have a chatbotMessages state
     //     setMessages([
     //         ...messages,
     //         { text: quizResponse, isBot: true },
     //     ]);
-    
+
     //     // You can add more logic here to interact with your chatbot
     // };
     //Quiz scenario
     const handleQuizScenarioAnswers = (e) => {
         e.preventDefault(); // prevents page from refreshing on submit
-    
+
         const quiz_scenario_data = new FormData(e.target);
         const quiz_scenario_OBJECT = Object.fromEntries(quiz_scenario_data.entries());
         const quiz_scenario_JSON = JSON.stringify(quiz_scenario_OBJECT);
-    
+
         fetch("http://127.0.0.1:8000/GetQuizScenarioJSON/?quiz_scenario_user_answers=" + quiz_scenario_JSON)
             .then(res => res.json())
             .then(
                 (result) => {
 
-                    // setinput(result.quiz_scenario_user_answers_response);
+                    setinput(result.quiz_scenario_user_answers_response);
                     // console.log(result.quiz_scenario_user_answers_response);
-    
-                    setMessages([
-                                ...messages,
-                                { text: result.quiz_scenario_user_answers_response, isBot: true },
-                            ]);
+
+                    // setMessages([
+                    //             ...messages,
+                    //             { text: result.quiz_scenario_user_answers_response, isBot: true },
+                    //         ]);
                 },
                 (error) => {
                     console.log("error fel quiz yasta");
@@ -391,7 +391,7 @@ function App() {
 
                         {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
                         {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover '> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover '> volume_off </button>}
-                   
+
                     </div>
                 </div>
             </div>
