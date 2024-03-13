@@ -260,10 +260,10 @@ function App() {
         });
     };
 
-    document.getElementById('chat-input').addEventListener('keyup', function () {
-        this.style.height = 0;
-        this.style.height = this.scrollHeight + 'px';
-        }, false);
+    // document.getElementById('chat-input').addEventListener('keyup', function () {
+    //     this.style.height = 0;
+    //     this.style.height = this.scrollHeight + 'px';
+    //     }, false);
     
     // const handleChatbotResponse = (quizResponse) => {
     //     // Your logic to interact with the chatbot based on the quiz response
@@ -290,10 +290,14 @@ function App() {
             .then(res => res.json())
             .then(
                 (result) => {
+
+                    // setinput(result.quiz_scenario_user_answers_response);
                     // console.log(result.quiz_scenario_user_answers_response);
     
-                    // Assuming you have a chatbot function or component
-                    setinput(result.quiz_scenario_user_answers_response);
+                    setMessages([
+                                ...messages,
+                                { text: result.quiz_scenario_user_answers_response, isBot: true },
+                            ]);
                 },
                 (error) => {
                     console.log("error fel quiz yasta");
