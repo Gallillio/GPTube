@@ -291,13 +291,12 @@ function App() {
             .then(
                 (result) => {
 
-                    setinput(result.quiz_scenario_user_answers_response);
-                    // console.log(result.quiz_scenario_user_answers_response);
+                    console.log(result.quiz_scenario_user_answers_response);
 
-                    // setMessages([
-                    //             ...messages,
-                    //             { text: result.quiz_scenario_user_answers_response, isBot: true },
-                    //         ]);
+                    setMessages([
+                        ...messages,
+                        { text: result.quiz_scenario_user_answers_response, isBot: true },
+                    ]);
                 },
                 (error) => {
                     console.log("error fel quiz yasta");
