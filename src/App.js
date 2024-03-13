@@ -260,24 +260,6 @@ function App() {
         });
     };
 
-    // document.getElementById('chat-input').addEventListener('keyup', function () {
-    //     this.style.height = 0;
-    //     this.style.height = this.scrollHeight + 'px';
-    //     }, false);
-
-    // const handleChatbotResponse = (quizResponse) => {
-    //     // Your logic to interact with the chatbot based on the quiz response
-    //     // This could involve updating the state or triggering chatbot messages
-    //     // console.log("Handling quiz response in chatbot:", quizResponse);
-
-    //     // Example: Assuming you have a chatbotMessages state
-    //     setMessages([
-    //         ...messages,
-    //         { text: quizResponse, isBot: true },
-    //     ]);
-
-    //     // You can add more logic here to interact with your chatbot
-    // };
     //Quiz scenario
     const handleQuizScenarioAnswers = (e) => {
         e.preventDefault(); // prevents page from refreshing on submit
@@ -286,11 +268,10 @@ function App() {
         const quiz_scenario_OBJECT = Object.fromEntries(quiz_scenario_data.entries());
         const quiz_scenario_JSON = JSON.stringify(quiz_scenario_OBJECT);
 
-        fetch("http://127.0.0.1:8000/GetQuizScenarioJSON/?quiz_scenario_user_answers=" + quiz_scenario_JSON)
+        fetch("http://127.0.0.1:8000/GetQuizAnswers/?quiz_scenario_user_answers=" + quiz_scenario_JSON)
             .then(res => res.json())
             .then(
                 (result) => {
-
                     console.log(result.quiz_scenario_user_answers_response);
 
                     setMessages([

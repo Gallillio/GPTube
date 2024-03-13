@@ -76,8 +76,8 @@ def GetTimeAndID(request):
             return JsonResponse({'Stopped_Time': "Error occurred: " + str(e)}, status=500)
 
 ### SCENARIOS ###
-def GetQuizScenarioJSON(request):
-    
+
+def GetQuizAnswers(request):
     if request.method == 'GET':
     # To get the correct answers
         with open('quiz_scenario_JSON.json', 'r') as file:
@@ -95,6 +95,7 @@ def GetQuizScenarioJSON(request):
         # print("\nUser Answers JSON: ", quiz_scenario_user_answers_JSON)
         # print("keys",quiz_scenario_user_answers_JSON.key())
         # print("vals")
+
         # Compare user answers with correct answers and save details of wrong answers
         wrong_answers = []
         for user_ans, correct_ans, question, choice in zip(quiz_scenario_user_answers_JSON.values(), 
@@ -115,9 +116,12 @@ def GetQuizScenarioJSON(request):
         else:
             response_message = f"You got {len(data) - len(wrong_answers)} out of {len(data)} answers correct. Here are the details of your wrong answers:"
             for wrong_answer in wrong_answers:
-                response_message += f"\n\nQuestion: {wrong_answer['question']}\nYour Answer: {wrong_answer['user_answer']}\nCorrect Answer: {wrong_answer['correct_answer']}\nChoices: {wrong_answer['choices']}"
+                response_message += f"\n\n Question: {wrong_answer['question']}\n Your Answer: {wrong_answer['user_answer']}\nCorrect Answer: {wrong_answer['correct_answer']}\nChoices: {wrong_answer['choices']}"
 
         return JsonResponse({"quiz_scenario_user_answers_response": response_message})
+
+def GetQuizScenarioJSON(request):
+    ...
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))
 # stopped_time = time_and_id_response.get('Stopped_Time', stopped_time)
 # video_id = time_and_id_response.get('Video_ID', video_id)
