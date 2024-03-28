@@ -277,7 +277,8 @@ def GenerateQuizJson(video_id, csv_file):
                         options_schema,
                         answer_schema]
     output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-    format_instructions = '''[
+    format_instructions = '''
+[
   {
     "question": "1. What is supervised machine learning?",
     "options": [
@@ -301,54 +302,19 @@ def GenerateQuizJson(video_id, csv_file):
       }
     ],
     "answer": "B"
-  },
-  {
-    "question": "3. What is the primary goal of supervised learning?",
-    "options": [
-      {
-        "A": "A. To minimize error on the training data.",
-        "B": "B. To maximize accuracy on the test data.",
-        "C": "C. To generalize well on unseen data.",
-        "D": "D. To memorize the training data."
-      }
-    ],
-    "answer": "C"
-  },
-  {
-    "question": "4. Which of the following tasks is NOT typically performed in supervised learning?",
-    "options": [
-      {
-        "A": "A. Classification",
-        "B": "B. Clustering",
-        "C": "C. Regression",
-        "D": "D. Anomaly detection"
-      }
-    ],
-    "answer": "B"
-  },
-  {
-    "question": "5. What is the process of supervised learning?",
-    "options": [
-      {
-        "A": "A. Feature engineering, model selection, training, evaluation",
-        "B": "B. Data collection, feature selection, training, deployment",
-        "C": "C. Data preprocessing, model training, testing, deployment",
-        "D": "D. Feature extraction, model validation, testing, deployment"
-      }
-    ],
-    "answer": "C"
   }
 ]
   '''
     quiz_template = """\
-    From the Transcript, generate 5 MCQ questions:
+    From the transcript, generate number of mcq questions (number specified by user) and if the user
+     didn't specify a number, generate 5 questions by default :
 
     The output should be formatted as the following schema:
 
     {format_instructions}
 
 
-    text: {text}
+    transcript: {text}
     """
     video_data = get_video_data_txt(csv_file, video_id)
     prompt = ChatPromptTemplate.from_template(template=quiz_template)
