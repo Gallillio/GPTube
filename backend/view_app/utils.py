@@ -167,7 +167,7 @@ def get_video_data_txt(csv_file, video_id):
         print(f"An error occurred: {str(e)}")
         return ""
 
-def GenerateQuizJson(video_id, csv_file):
+def GenerateQuizJson(video_id, csv_file, input):
     question_schema = ResponseSchema(name="question",
                              description="The question")
     options_schema = ResponseSchema(name="options",
@@ -217,11 +217,14 @@ def GenerateQuizJson(video_id, csv_file):
 
 
     transcript: {text}
+
+    User question: {input}
     """
     video_data = get_video_data_txt(csv_file, video_id)
     prompt = ChatPromptTemplate.from_template(template=quiz_template)
     messages = prompt.format_messages(text=video_data, 
-                                format_instructions=format_instructions)
+                                format_instructions=format_instructions,
+                                input = input)
     chat = ConnectToAzure()
     quiz = chat(messages)
     parser = JsonOutputParser()

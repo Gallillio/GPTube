@@ -29,7 +29,7 @@ def GetChatbotResponseAjax(request):
         response = RoutingResponse(query)
         print(response)
         if "quiz" in response.lower():
-            GetGenerateQuizJson(request)
+            GetGenerateQuizJson(request, query)
         else:
         # Attempt to read stopped_time and video_id from file
             try:
@@ -78,12 +78,12 @@ def GetTimeAndID(request):
             return JsonResponse({'Stopped_Time': "Error occurred: " + str(e)}, status=500)
 
 ### SCENARIOS ###
-def GetGenerateQuizJson(request):
+def GetGenerateQuizJson(request, input):
     csv_file = "video_data/videos_transcript.csv"
     if request.method == 'GET':
         video_id = request.GET.get('videoId')
-        Quiz = GenerateQuizJson(video_id, csv_file)
-
+        Quiz = GenerateQuizJson(video_id, csv_file, input)
+        print("Quiz: "+ Quiz)
         return JsonResponse({"quiz": Quiz})
     
 def GetQuizAnswers(request):
