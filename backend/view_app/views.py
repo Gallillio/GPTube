@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
-from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson
+from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson, RoutingResponse
 from django.http import JsonResponse
 from django.core.cache import cache
 import json
 
 def base(request):
     return HttpResponse("<h2> go to /GetChatbotResponseAjax/")
+
 
 def UseScenarioOrChatbotResponse(request):
     # Connect to Azure OpenAI 
@@ -25,23 +26,28 @@ def GetChatbotResponseAjax(request):
         query = request.GET.get('query')
         videoId = request.GET.get('videoId')
         stopped_time = None
+        response = RoutingResponse(query)
+        print(response)
+        if "quiz" in response.lower():
+            GetGenerateQuizJson(request)
+        else:
         # Attempt to read stopped_time and video_id from file
-        try:
-            with open("video_data/video_data.json", "r") as f:
-                data = json.load(f)
-            stopped_time = data.get('Stopped_Time', stopped_time)
-        except FileNotFoundError:
-            pass  # File doesn't exist yet
-        except Exception as e:
-            return JsonResponse({"gpt_response": "Error occurred: " + str(e)}, status=500)
+            try:
+                with open("video_data/video_data.json", "r") as f:
+                    data = json.load(f)
+                stopped_time = data.get('Stopped_Time', stopped_time)
+            except FileNotFoundError:
+                pass  # File doesn't exist yet
+            except Exception as e:
+                return JsonResponse({"gpt_response": "Error occurred: " + str(e)}, status=500)
 
-        print("Stopped Time wohooo:", stopped_time)
+            print("Stopped Time wohooo:", stopped_time)
         
-        gpt_response, use_scenario, Quiz = GetChatboxResponse(query, videoId, stopped_time)
-
-        return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId, "quiz": Quiz})
-    else:
-        return JsonResponse({"gpt_response": "Method not allowed"}, status=405)
+            gpt_response, use_scenario = GetChatboxResponse(query, videoId, stopped_time)
+        if gpt_response:
+            return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId})
+        else:
+            return JsonResponse({"gpt_response": "Method not allowed"}, status=405)
 
 def GetTimeAndID(request):
     if request.method == 'GET':

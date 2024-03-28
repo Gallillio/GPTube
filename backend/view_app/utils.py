@@ -79,104 +79,6 @@ def MemoryWithVectorStore():
     retriever = vectorstore.as_retriever(search_kwargs=dict(k=4))
     return VectorStoreRetrieverMemory(retriever=retriever)
 
-def GenerateQuizJson(video_id, csv_file):
-    question_schema = ResponseSchema(name="question",
-                             description="The question")
-    options_schema = ResponseSchema(name="options",
-                                      description="A dictionary that contains A, B, C, D")
-    answer_schema = ResponseSchema(name="answer",
-                                    description="The answer of the question")
-
-    response_schemas = [question_schema, 
-                        options_schema,
-                        answer_schema]
-    output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
-    format_instructions = '''[
-  {
-    "question": "1. What is supervised machine learning?",
-    "options": [
-      {
-        "A": "A. A type of learning where the model learns from labeled data.",
-        "B": "B. A type of learning where the model learns from unlabeled data.",
-        "C": "C. A type of learning where the model learns from reinforcement.",
-        "D": "D. A type of learning where the model learns from semi-labeled data."
-      }
-    ],
-    "answer": "A"
-  },
-  {
-    "question": "2. Which of the following is an example of supervised learning algorithm?",
-    "options": [
-      {
-        "A": "A. K-Means clustering",
-        "B": "B. Decision tree",
-        "C": "C. K-Nearest Neighbors",
-        "D": "D. Apriori algorithm"
-      }
-    ],
-    "answer": "B"
-  },
-  {
-    "question": "3. What is the primary goal of supervised learning?",
-    "options": [
-      {
-        "A": "A. To minimize error on the training data.",
-        "B": "B. To maximize accuracy on the test data.",
-        "C": "C. To generalize well on unseen data.",
-        "D": "D. To memorize the training data."
-      }
-    ],
-    "answer": "C"
-  },
-  {
-    "question": "4. Which of the following tasks is NOT typically performed in supervised learning?",
-    "options": [
-      {
-        "A": "A. Classification",
-        "B": "B. Clustering",
-        "C": "C. Regression",
-        "D": "D. Anomaly detection"
-      }
-    ],
-    "answer": "B"
-  },
-  {
-    "question": "5. What is the process of supervised learning?",
-    "options": [
-      {
-        "A": "A. Feature engineering, model selection, training, evaluation",
-        "B": "B. Data collection, feature selection, training, deployment",
-        "C": "C. Data preprocessing, model training, testing, deployment",
-        "D": "D. Feature extraction, model validation, testing, deployment"
-      }
-    ],
-    "answer": "C"
-  }
-]
-  '''
-    quiz_template = """\
-    From the Transcript, generate 5 MCQ questions:
-
-    The output should be formatted as the following schema:
-
-    {format_instructions}
-
-
-    text: {text}
-    """
-    video_data = get_video_data_txt(csv_file, video_id)
-    prompt = ChatPromptTemplate.from_template(template=quiz_template)
-    messages = prompt.format_messages(text=video_data, 
-                                format_instructions=format_instructions)
-    chat = ConnectToAzure()
-    quiz = chat(messages)
-    parser = JsonOutputParser()
-    quiz_dict = parser.parse(quiz.content)
-    file_name = "./../src/quiz_scenario_JSON.json"
-    with open(file_name, 'w') as json_file:
-        json.dump(quiz_dict, json_file)
-    return quiz_dict
-
 def SummarizationMemory():
     model = ConnectToAzure()
     return ConversationSummaryBufferMemory(llm=model, max_token_limit=1000, memory_key="history",  input_key='input')
@@ -342,14 +244,42 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
         global conversation
         csv_file = "video_data/videos_transcript.csv"
         video_data = get_video_data_txt(csv_file, video_id)
-        Quiz = GenerateQuizJson(video_id, csv_file)
+        # Quiz = GenerateQuizJson(video_id, csv_file)
         
         if conversation is None:
             conversation = ConversationChainWithMemory(video_data, stopped_time)
-            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = video_data), use_scenario, Quiz   
+            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = video_data), use_scenario  
         else:
-            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = video_data), use_scenario, Quiz
+            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = video_data), use_scenario
+
+def RoutingResponse(user_input):
+    chain = (
+    ChatPromptTemplate.from_template(
+        """Given the user question below, see if it is a basic question related to the video or a question that needs
+          the AI to test him or quiz him. classify it as either being about `Default` or `Quiz`
+
+Do not respond with more than one word.
+
+<question>
+{question}
+</question>
+
+Classification:"""
+    )
+  )   
+    chain = chain.invoke({"question": user_input}) 
+    chat = ConnectToAzure()
+    response = chat(chain.messages).content.lower()
+    return response
+    # if "quiz" in response.lower():
+    #     GenerateQuizJson(video_id, csv_file)
+    # else:
+    #     GetChatboxResponse(user_input, video_id, stopped_time)
+
+
+        
     
+
 
             
 
