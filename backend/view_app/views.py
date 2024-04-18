@@ -9,15 +9,6 @@ import json
 def base(request):
     return HttpResponse("<h2> go to /GetChatbotResponseAjax/")
 
-
-def UseScenarioOrChatbotResponse(request):
-    # Connect to Azure OpenAI 
-    ConnectToAzure()
-
-    if request.method == 'GET':
-        query = request.GET.get('query')
-        videoId = request.GET.get('videoId')
-
 def GetChatbotResponseAjax(request):
     # Connect to Azure OpenAI 
     ConnectToAzure()

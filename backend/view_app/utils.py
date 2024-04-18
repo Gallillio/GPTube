@@ -128,10 +128,6 @@ def ConversationChainWithMemory(video_data, stopped_time):
     )
     return conversation
 
-def UseScenarioOrChatbot():
-    # query = test me on this subject
-    ...
-
 def get_video_data_txt(csv_file, video_id):
     """
     Function to read a CSV file and retrieve text data along with start and duration for a given video_id.
@@ -247,7 +243,6 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
         global conversation
         csv_file = "video_data/videos_transcript.csv"
         video_data = get_video_data_txt(csv_file, video_id)
-        # Quiz = GenerateQuizJson(video_id, csv_file)
         
         if conversation is None:
             conversation = ConversationChainWithMemory(video_data, stopped_time)
@@ -274,16 +269,6 @@ Classification:"""
     chat = ConnectToAzure()
     response = chat(chain.messages).content.lower()
     return response
-    # if "quiz" in response.lower():
-    #     GenerateQuizJson(video_id, csv_file)
-    # else:
-    #     GetChatboxResponse(user_input, video_id, stopped_time)
-
-
-        
-    
-
-
             
 
 #response, user = GetChatboxResponse(user_input = 'Illustrate the last 60 seconds', video_id = '-9TdpdjDtAM', stopped_time = '90')
