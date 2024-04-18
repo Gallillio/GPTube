@@ -124,6 +124,7 @@ def GetQuizAnswers(request):
             response_message = f"You got {len(data) - len(wrong_answers)} out of {len(data)} answers correct. Here are the details of your wrong answers:"
             for wrong_answer in wrong_answers:
                 response_message += f"\n\n Question: {wrong_answer['question']}\n Your Answer: {wrong_answer['user_answer']}\nCorrect Answer: {wrong_answer['correct_answer']}\nChoices: {wrong_answer['choices']}"
+                
 
         return JsonResponse({"quiz_scenario_user_answers_response": response_message})
     

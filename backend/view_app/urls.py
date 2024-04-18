@@ -2,7 +2,7 @@
 All side urls are kept here
 """
 from django.urls import path
-from .views import base, UseScenarioOrChatbotResponse, GetChatbotResponseAjax, GetTimeAndID, GetQuizAnswers, GetGenerateQuizJson
+from .views import base, GetChatbotResponseAjax, GetTimeAndID, GetQuizAnswers, GetGenerateQuizJson
 from django.urls import URLPattern
 
 urlpatterns = [
