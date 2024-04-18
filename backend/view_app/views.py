@@ -27,9 +27,14 @@ def GetChatbotResponseAjax(request):
         videoId = request.GET.get('videoId')
         stopped_time = None
         response = RoutingResponse(query)
-        print(response)
+        print(response, "\n ======================================")
+        # quiz scenario
         if "quiz" in response.lower():
             GetGenerateQuizJson(request, query)
+
+            gpt_response = "Quiz has been generated in the Scenario Section"
+            use_scenario = True
+        # normal message
         else:
         # Attempt to read stopped_time and video_id from file
             try:
@@ -44,6 +49,8 @@ def GetChatbotResponseAjax(request):
             print("Stopped Time wohooo:", stopped_time)
         
             gpt_response, use_scenario = GetChatboxResponse(query, videoId, stopped_time)
+            print("\n\n\n\n\n gpt_response: \n", gpt_response, "\n\n\n\n\n")
+
         if gpt_response:
             return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId})
         else:
@@ -83,7 +90,7 @@ def GetGenerateQuizJson(request, input):
     if request.method == 'GET':
         video_id = request.GET.get('videoId')
         Quiz = GenerateQuizJson(video_id, csv_file, input)
-        print("Quiz: "+ Quiz)
+        print("Quiz: \n", Quiz)
         return JsonResponse({"quiz": Quiz})
     
 def GetQuizAnswers(request):

@@ -51,6 +51,14 @@ function App() {
 
     }, [input])
 
+    const [useScenario, setUseScenario] = useState(false) //this is set with every message sent from user, checks if message sent is scenario or just text for chatbox
+    const [displayScenarioBox, setDisplayScenario] = useState(false) //this will display the scenario box when useScenario is true once. We do this incase the box is displayed once but we want to keep the box open even if another message is sent 
+    useEffect(() => {
+        if (useScenario == true) {
+            setDisplayScenario(true)
+        }
+    }, [useScenario])
+
     const queryResponse = async () => {
         setIsInputDisabled(true);
 
@@ -68,7 +76,9 @@ function App() {
                     setIsLoaded(true);
                     setGPT_response(result.gpt_response)
                     setQuiz(result.quiz)
-                    console.log(result.quiz)
+                    setUseScenario(result.use_scenario)
+
+                    console.log("USE SCENARIO: " + result.use_scenario)
                 },
                 (error) => {
                     setIsLoaded(true);
@@ -332,40 +342,46 @@ function App() {
                 <div className='center-video'>
                     <Video />
                 </div>
-                <div className="scenario-section">
-                    <form onSubmit={handleQuizScenarioAnswers}>
-                        {quizScenario.map(item => {
-                            return (
-                                <div className='quiz-scenraio-box'>
-                                    <span><b> {item.question} </b></span>
-                                    {item.options.map(option => {
-                                        return (
-                                            <div>
-                                                {Object.keys(option).map(key => {
-                                                    return (
-                                                        <div>
-                                                            <input
-                                                                type="radio"
-                                                                id={item.question + key}
-                                                                name={item.question}
-                                                                value={key}
-                                                                required
-                                                            />
-                                                            <label for={item.question + key}> {option[key]} </label>
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        )
-                                    })}
-                                </div>
-                            )
-                        })}
+                {/* displays scenariio box when  displayScenarioBox == true*/}
+                {!displayScenarioBox ?
+                    <span></span>
+                    :
+                    <div className="scenario-section">
+                        <form onSubmit={handleQuizScenarioAnswers}>
+                            {quizScenario.map(item => {
+                                return (
+                                    <div className='quiz-scenraio-box'>
+                                        <span><b> {item.question} </b></span>
+                                        {item.options.map(option => {
+                                            return (
+                                                <div>
+                                                    {Object.keys(option).map(key => {
+                                                        return (
+                                                            <div>
+                                                                <input
+                                                                    type="radio"
+                                                                    id={item.question + key}
+                                                                    name={item.question}
+                                                                    value={key}
+                                                                    required
+                                                                />
+                                                                <label for={item.question + key}> {option[key]} </label>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )
+                            })}
 
-                        <input type="submit" value="Get Results" />
-                    </form>
+                            <input type="submit" value="Get Results" />
+                        </form>
+                    </div>
+                }
 
-                </div>
+
             </div>
             <div className="right-section">
                 <div className='livechat-title'>
@@ -393,7 +409,7 @@ function App() {
                         {/* if TTS is on, replace the TTS on with TTS off, and vice versa */}
                         {isTextToSpeeching ? <button onClick={stopTextToSpeech} className='send material-symbols-rounded hover'> text_to_speech </button> : <button onClick={resumeTextToSpeech} className=' send material-symbols-rounded hover '> volume_off </button>}
                     </div>
-                    <button onClick={handleGenerateQuizScenario}> quiz scenario </button>
+                    {/* <button onClick={handleGenerateQuizScenario}> quiz scenario </button> */}
                 </div>
             </div>
         </div>
