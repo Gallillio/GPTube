@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
-from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson, RoutingResponse
+from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson, RoutingResponse,quiz_as_a_context
 from django.http import JsonResponse
 from django.core.cache import cache
 import json
@@ -97,7 +97,8 @@ def GetQuizAnswers(request):
         # Extract choices and questions
         choices = [item.get('options') for item in data]
         questions = [item.get('question') for item in data]
-        
+        stopped_time = request.GET.get('stoppedTime')
+
         # Printing for debugging
         # print("\nUser Answers JSON: ", quiz_scenario_user_answers_JSON)
         # print("keys",quiz_scenario_user_answers_JSON.key())
@@ -125,8 +126,10 @@ def GetQuizAnswers(request):
             for wrong_answer in wrong_answers:
                 response_message += f"\n\n Question: {wrong_answer['question']}\n Your Answer: {wrong_answer['user_answer']}\nCorrect Answer: {wrong_answer['correct_answer']}\nChoices: {wrong_answer['choices']}"
                 
+        
+        gpt_response = quiz_as_a_context(response_message, stopped_time)
 
-        return JsonResponse({"quiz_scenario_user_answers_response": response_message})
+        return JsonResponse({"quiz_scenario_user_answers_response": gpt_response})
     
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))
 # stopped_time = time_and_id_response.get('Stopped_Time', stopped_time)

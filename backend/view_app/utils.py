@@ -338,3 +338,14 @@ Classification:"""
 #     agent = MakeAgentWithMemory(model, tools)
     
 #     return agent
+
+def quiz_as_a_context(input,stopped_time):
+        video_data = input
+
+        global conversation
+        
+        if conversation is None:
+            conversation = ConversationChainWithMemory(video_data, stopped_time)
+            return conversation.predict(input = input , stopped_time = stopped_time , given_data = video_data) 
+        else:
+            return conversation.predict(input = input ,stopped_time = stopped_time  , given_data = video_data)
