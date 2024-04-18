@@ -228,6 +228,9 @@ def GenerateQuizJson(video_id, csv_file, input):
     file_name = "./../src/quiz_scenario_JSON.json"
     with open(file_name, 'w') as json_file:
         json.dump(quiz_dict, json_file)
+    file_name_back = "./quiz_scenario_JSON.json"
+    with open(file_name_back, 'w') as json_file:
+        json.dump(quiz_dict, json_file)
     return quiz_dict
 
 def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
@@ -253,8 +256,12 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
 def RoutingResponse(user_input):
     chain = (
     ChatPromptTemplate.from_template(
-        """Given the user question below, see if it is a basic question related to the video or a question that needs
-          the AI to test him or quiz him. classify it as either being about `Default` or `Quiz`
+        """Given the user question below, see if it is a basic question related to the video and it can be also asking about what he did wrong in the quiz or a question that needs
+          the AI to test him or quiz him based on some keywords such as("Quiz me", "Test me", "Question time", "Quiz time",
+          "I'm ready for a quiz", "Can you quiz me?", "Ask me questions", "Let's do a quiz", "Challenge me",
+          "Quiz session", "Test my knowledge", "Pop quiz", "Examine me", "Assess my knowledge", "Evaluation time" 
+          , "Knowledge check", "Quizzer", "Knowledge quiz", "Knowledge test", 
+            "Ask away" ). classify it as either being about `Default` or `Quiz`
 
 Do not respond with more than one word.
 
