@@ -151,9 +151,9 @@ function App() {
                 response,
                 function (result) {
                     if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
-                        console.log("Done");
+                        console.log("Done Text to speeching");
                     } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
-                        console.log("cancelled");
+                        console.log("cancelled text to speeching");
 
                     }
                     // window.console.log(result);
