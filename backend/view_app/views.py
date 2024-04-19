@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
-from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson, RoutingResponse,quiz_as_a_context
+from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson, RoutingResponse,QuizAsContext
 from django.http import JsonResponse
 from django.core.cache import cache
 import json
@@ -18,16 +18,24 @@ def GetChatbotResponseAjax(request):
         videoId = request.GET.get('videoId')
         stopped_time = None
         response = RoutingResponse(query)
-        print(response, "\n ======================================")
+        # print(response, "\n ======================================")
         # quiz scenario
         if "quiz" in response.lower():
+            print("\n\n", "Quiz Scenario", "\n\n")
             GetGenerateQuizJson(request, query)
 
             gpt_response = "Quiz has been generated in the Scenario Section"
             use_scenario = True
+        elif "pp" in response.lower():
+            print("\n\n", "Presentation Scenario", "\n\n")
+            # GetGenerateQuizJson(request, query)
+
+            gpt_response = "Presentation has been generated in the Scenario Section"
+            use_scenario = True
         # normal message
         else:
-        # Attempt to read stopped_time and video_id from file
+            print("\n\n", "chat message scenario", "\n\n")
+            # Attempt to read stopped_time and video_id from file
             try:
                 with open("video_data/video_data.json", "r") as f:
                     data = json.load(f)
@@ -37,10 +45,10 @@ def GetChatbotResponseAjax(request):
             except Exception as e:
                 return JsonResponse({"gpt_response": "Error occurred: " + str(e)}, status=500)
 
-            print("Stopped Time wohooo:", stopped_time)
+            # print("Stopped Time wohooo:", stopped_time)
         
             gpt_response, use_scenario = GetChatboxResponse(query, videoId, stopped_time)
-            print("\n\n\n\n\n gpt_response: \n", gpt_response, "\n\n\n\n\n")
+            # print("\n\n\n\n\n gpt_response: \n", gpt_response, "\n\n\n\n\n")
 
         if gpt_response:
             return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId})
@@ -81,7 +89,7 @@ def GetGenerateQuizJson(request, input):
     if request.method == 'GET':
         video_id = request.GET.get('videoId')
         Quiz = GenerateQuizJson(video_id, csv_file, input)
-        print("Quiz: \n", Quiz)
+        # print("Quiz: \n", Quiz)
         return JsonResponse({"quiz": Quiz})
     
 def GetQuizAnswers(request):
@@ -127,7 +135,7 @@ def GetQuizAnswers(request):
                 response_message += f"\n\n Question: {wrong_answer['question']}\n Your Answer: {wrong_answer['user_answer']}\nCorrect Answer: {wrong_answer['correct_answer']}\nChoices: {wrong_answer['choices']}"
                 
         
-        gpt_response = quiz_as_a_context(response_message, stopped_time)
+        gpt_response = QuizAsContext(response_message, stopped_time)
 
         return JsonResponse({"quiz_scenario_user_answers_response": gpt_response})
     

@@ -63,7 +63,7 @@ def ConnectToAzureEmbedding():
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     OPENAI_API_DEPLOYMENT_URL = os.getenv("OPENAI_API_DEPLOYMENT_URL")
 
-    return AzureOpenAIEmbeddings(  
+    return AzureOpenAIEmbeddings(
     openai_api_base=OPENAI_API_DEPLOYMENT_URL,
     openai_api_version=OPENAI_API_VERSION,
     openai_api_key=OPENAI_API_KEY,
@@ -226,6 +226,7 @@ def GenerateQuizJson(video_id, csv_file, input):
     parser = JsonOutputParser()
     quiz_dict = parser.parse(quiz.content)
     file_name = "./../src/quiz_scenario_JSON.json"
+    
     with open(file_name, 'w') as json_file:
         json.dump(quiz_dict, json_file)
     file_name_back = "./quiz_scenario_JSON.json"
@@ -256,12 +257,12 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
 def RoutingResponse(user_input):
     chain = (
     ChatPromptTemplate.from_template(
-        """Given the user question below, see if it is a basic question related to the video and it can be also asking about what he did wrong in the quiz or a question that needs
-          the AI to test him or quiz him based on some keywords such as("Quiz me", "Test me", "Question time", "Quiz time",
-          "I'm ready for a quiz", "Can you quiz me?", "Ask me questions", "Let's do a quiz", "Challenge me",
-          "Quiz session", "Test my knowledge", "Pop quiz", "Examine me", "Assess my knowledge", "Evaluation time" 
-          , "Knowledge check", "Quizzer", "Knowledge quiz", "Knowledge test", 
-            "Ask away" ). classify it as either being about `Default` or `Quiz`
+        """Given the user prompt, it can be classified in 3 ways: `Default`, `Quiz` `pp`.
+        I'll provide a description for each classification and you have to decide depending on the user prompt which class is most appropriate.
+        Descriptions:
+        - `Default`: used when user prompt is a question related to the video OR if the user question is a question ABOUT a quiz that they did, for example something along the lines of 'explain a question 2' or 'explain why answer B in question 3 is wrong'.
+        - `Quiz`: used when the user prompt is for the AI to quiz him, this should ONLY be done when the user asks to be tested.
+        - `pp`: used when the user prompt is for the AI to make a powerpoint presentation for him, ONLY use it in that case.
 
 Do not respond with more than one word.
 
@@ -276,77 +277,8 @@ Classification:"""
     chat = ConnectToAzure()
     response = chat(chain.messages).content.lower()
     return response
-            
 
-#response, user = GetChatboxResponse(user_input = 'Illustrate the last 60 seconds', video_id = '-9TdpdjDtAM', stopped_time = '90')
-#print(f'Response = {response}')
-# csv_file = "data/videos_transcript.csv"
-
-# video_data_json = get_video_data(csv_file, 'zgtepSTqzgc')
-# print(video_data_json)
-
-
-## CHATBOT SECTION ##
-
-# def CompareDatesFunc(given_date):
-#     if "," in given_date:
-#         given_date = given_date.replace(",", "/")
-#     elif " " in given_date:
-#         given_date = given_date.replace(" ", "/")
-#     elif "-" in given_date:
-#         given_date = given_date.replace("-", "/")
-#     elif "." in given_date:
-#         given_date = given_date.replace(".", "/")
-#     given_date = datetime.strptime(given_date, "%d/%m/%Y").date()
-#     today_date = date.today()
-    
-#     date_difference = (given_date - today_date).days
-#     return str(date_difference)
-
-# class CompareDatesTool(BaseTool):
-#     name = "Compare Dates"
-#     description = "use this tool when you have a date and need to subtract it from today's date"
-#     def _run(self, given_date: str = None,):
-#         # check for the values we have been given
-#         if given_date:
-#             return CompareDatesFunc(given_date)
-#         else:
-#             return "BAD BOI."
-        
-#     def _arun(self, query: str):
-#         raise NotImplementedError("This tool does not support async")
-
-# def MakeAgentWithMemory(model, tools):
-#     chat_history = MessagesPlaceholder(variable_name="chat_history")
-#     #memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-#     memory = MemoryWithVectorStore()
-#     agent = initialize_agent(
-#         agent = AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-#         tools = tools,
-#         llm = model,
-#         handle_parsing_errors = True,
-#         verbose = True,
-#         agent_kwargs={
-#             "memory_prompts": [chat_history],
-#             "input_variables": ["input", "agent_scratchpad", "chat_history"]
-#         },
-#         memory=memory,
-#     )
-#     return agent
-
-# def UseAgent():
-#     """
-#     This function is to properly add memory
-#     by using MakeAgentWithMemory()
-#     """
-#     model = ConnectToAzure()
-#     #All tools
-#     tools = [CompareDatesTool()]
-#     agent = MakeAgentWithMemory(model, tools)
-    
-#     return agent
-
-def quiz_as_a_context(input,stopped_time):
+def QuizAsContext(input,stopped_time):
         video_data = input
 
         global conversation
