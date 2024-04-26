@@ -250,6 +250,39 @@ textarea {
     overflow-y: hidden;
     
 }
+.code-block {
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.copy-btn:hover {
+    background-color: #0056b3;
+}
+
+pre {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    overflow-x: auto; /* Enable horizontal scrollbar if needed */
+    white-space: pre-wrap; /* Preserve line breaks */
+}
+
+code {
+    font-family: 'Roboto Mono', monospace;
+}
+
 
 
 

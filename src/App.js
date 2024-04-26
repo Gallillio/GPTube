@@ -44,6 +44,8 @@ function App() {
             return;
         }
         rendered.current++;
+
+
     }, [GPT_response])
 
     useEffect(() => {
@@ -86,6 +88,17 @@ function App() {
                 }
             )
     }
+        const hasCodeBlock = GPT_response.includes("```");
+        if (hasCodeBlock) {
+            // If the content has code block, wrap it in a <pre><code> element
+            const codeContent = GPT_response.replace(/```([\s\S]+?)```/g, '<p><pre><code>$1</code></pre></p>');
+            const container = document.getElementById("chatbox");
+            container.innerHTML = codeContent
+
+            
+            setGPT_response(codeContent);
+            console.log("mawgod");
+        }
 
     const HandleSend = async () => {
 
@@ -389,10 +402,10 @@ function App() {
                     <hr />
                     <br />
                 </div>
-                <div className="chatbox" ref={chatContainerRef}>
+                <div className="chatbox"  id ="chatbox" ref={chatContainerRef}>
                     {messages.map((message, i) => {
                         return <div key={i} className={message.isBot ? "chat bot" : "chat"}>
-                            <img src={message.isBot ? gptImageLogo : userProfilePicture} alt="" className='chatImg' /> <p className="textOutput"> {message.text} </p>
+                            <img src={message.isBot ? gptImageLogo : userProfilePicture} alt="" className='chatImg' /> <p className="textOutput" id="response"> {message.text} </p>
                         </div>
                     })}
                 </div>

@@ -90,6 +90,7 @@ def ConversationChainWithMemory(video_data, stopped_time):
     but if the question or what he said is normal like hello or telling his name (talking like a friend) respond normally as an AI.
     Any questions that you can respond as an AI, Don't hesitate to respond.
     Respond to anything related to the video as illustration, summarization and generating questions from the video.
+    and if the user wanted a code you wrap the code response with ``` 
     
     Video Stopped time: ///{stopped_time}///
     This Video stopped time is used if the user asked to illustrate or summarize the last minute before the stopped time or summarize the after. 
