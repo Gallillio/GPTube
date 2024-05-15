@@ -1,5 +1,8 @@
 .app {
     display: flex;
+    height: 100vh;
+    background-color: var(--incoming-chat-bg);
+
   }
   
   .left-section {
@@ -9,12 +12,12 @@
   
   .left-section.open {
     width: 200px; /* Adjust as needed */
+    height: 98vh;
+    background-color:var(--blur);
+    
   }
   
-  .middle-section {
-    flex-grow: 1;
-  }
-  
+
   .right-section {
     width: 200px; /* Adjust as needed */
   }
@@ -22,8 +25,9 @@
   .burger-menu {
     cursor: pointer;
     padding: 10px;
-    background-color: #333;
+    /* background-color: var(--blur); */
     color: white;
+    position: flex;
   }
 
   /* Import Google font - Poppins */
@@ -35,7 +39,6 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
-
     color: var(--text-color);
 }
 
@@ -51,6 +54,8 @@
     --incoming-chat-border: #444654;
     --blur-background: rgba(52, 53, 65, 0.7);
     --video-window-drop-shadow: rgb(70, 68, 68);
+    --blur:rgba(63, 62, 62, 0.364);
+
     
     }
     .light-mode {
@@ -69,22 +74,22 @@
     
 .App{
     display: flex;
-    height: 100vh;
     justify-content:space-between;
+    
+
 }
 
 .left-section{
     /* border: 3px solid red; */
-    width: 20%;
-    font-size: 20px;
+    /* width: 20%; */
+    /* font-size: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    padding-bottom: 30px;
+    padding-bottom: 30px; */
 
-    background-color: var(--outgoing-chat-bg);
 }
 
 .left-section-lower-part{
@@ -110,25 +115,25 @@
 
 .middle-section{
     /* border: 3px solid green; */
-
+    flex-grow: 1;
     padding: 1%;
-    width: 100%;
+    /* width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-
+    justify-content: space-between; */
     background-color: var(--incoming-chat-bg);
 }
 
 .scenario-section{
-    height: 40%;
-    width: 70%;
+    height: 35%;
+    width: 80%;
     border-radius: 20px;
     padding: 20px;
     overflow: hidden;
     overflow-y:scroll;
     align-self: center;
+    margin-left: 10%;
 
     background-color: var(--outgoing-chat-bg);
 }
@@ -275,5 +280,53 @@ textarea {
     
 }
 
+.burger-menu-opened
+{
+    cursor: pointer;
+    padding: 10px;
+    /* background-color: var(--blur); */
+    color: white;
+}
 
-
+.welcomePageContainer{
+    justify-content: center;
+    align-items: center;
+    padding-left: 30%;
+    padding-top: 20%;
+    font-size: 100px;
+    user-select: none;
+    animation: waving-hands 2.5s infinite;
+    transform-origin: 70% 70%;
+    display: inline-block;
+}
+@keyframes waving-hands {
+    0% {
+        transform: rotate(0deg);
+    }
+    10% {
+        transform: rotate(14deg);
+    }
+    20% {
+        transform: rotate(-8deg);
+    }
+    30% {
+        transform: rotate(14deg);
+    }
+    40% {
+        transform: rotate(-4deg);
+    }
+    50% {
+        transform: rotate(10deg);
+    }
+    60% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+.paragraph{
+    font-size: large;
+    margin-top: 10%;
+    margin-left: 25%;
+}
