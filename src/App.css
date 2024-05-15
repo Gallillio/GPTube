@@ -187,6 +187,8 @@
 .user-profile-picture{
     border-radius: 80px;
     width: 100px;
+    user-select: none;
+
 }
 
 .chat {
@@ -329,4 +331,6 @@ textarea {
     font-size: large;
     margin-top: 10%;
     margin-left: 25%;
+    user-select: none;
+
 }
