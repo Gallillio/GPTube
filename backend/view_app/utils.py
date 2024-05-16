@@ -14,6 +14,7 @@ from dotenv import load_dotenv, find_dotenv
 from datetime import date, datetime
 from langchain.chat_models import AzureChatOpenAI
 from langchain_openai import AzureOpenAIEmbeddings
+from sentence_transformers import SentenceTransformer
 from langchain.docstore import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
@@ -70,6 +71,21 @@ def ConnectToAzureEmbedding():
     openai_api_type=OPENAI_API_TYPE,
 )
 
+def ConnectToE5Embedding():
+    return SentenceTransformer("intfloat/multilingual-e5-base")
+
+def RagWithFaiss(question, context):
+    model = ConnectToE5Embedding()
+    question_embedding = model.encode([question])
+    paragraph_embedding = model.encode(context)
+    d = question_embedding.shape[1]
+    index = faiss.IndexFlatIP(d)
+    index.add(paragraph_embedding)
+    D, I = index.search(question_embedding, k = 3)  # search
+    I = I[0]
+    context = [context[k] for k in I]
+    return context
+
 def MemoryWithVectorStore():
     embeddings = ConnectToAzureEmbedding()
     embedding_size = 1536 # Dimensions of the OpenAIEmbeddings
@@ -96,8 +112,8 @@ def ConversationChainWithMemory(video_data, stopped_time):
     
     Video Transcript: ""{given_data}""
 
-    (Video Transcript is a given transcript of a video, it is given as a dictionary format including a 
-    (the minute from and to (example: (1-2))- the text in this minute) 
+    (Video Transcript is a given transcript of a video, it is given as a text format including a 
+    (the text in this minute - the minute from and to (example: (1-2))) 
     Use the minute to know from the stopped time of the video where is the specific time the user talking about and 
     responding with data relevant to that time (like if he asked to illustrate last 5 mins)).
     or asked: 'can you test my knowledge from what I heard so far', you should know where he stopped , what is the part
@@ -144,19 +160,18 @@ def get_video_data_txt(csv_file, video_id):
         video_data = df[df['video_id'] == video_id]
 
         # Initialize a dictionary to hold the transcript data
-        transcript_dict = {}
+        transcript_list = []
 
         # Iterate over the rows and group text by minute
         for index, row in video_data.iterrows():
             minute = row['minute']
             text = row['text']
 
-            if minute in transcript_dict:
-                transcript_dict[minute] += f" {text}"
-            else:
-                transcript_dict[minute] = text
+            formatted_text = f"text: {text}, minute = {minute}"
 
-        return transcript_dict
+            transcript_list.append(formatted_text)
+
+        return transcript_list
     
     except FileNotFoundError:
         print(f"Error: File '{csv_file}' not found.")
@@ -249,12 +264,13 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
         global conversation
         csv_file = "video_data/reformatted_transcript.csv"
         video_data = get_video_data_txt(csv_file, video_id)
+        context = RagWithFaiss(user_input, video_data)
         
         if conversation is None:
             conversation = ConversationChainWithMemory(video_data, stopped_time)
-            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = video_data), use_scenario  
+            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = context), use_scenario  
         else:
-            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = video_data), use_scenario
+            return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = context), use_scenario
 
 def RoutingResponse(user_input):
     chain = (
