@@ -96,14 +96,11 @@ def ConversationChainWithMemory(video_data, stopped_time):
     
     Video Transcript: ""{given_data}""
 
-    (Video Transcript is a given transcript of a video, it is given as a text format including a 
-    (the text itself - startime of a specific text - duration of this specific text) 
-    Use the start time to know from the stopped time of the video where is the specific time the user talking about and 
+    (Video Transcript is a given transcript of a video, it is given as a dictionary format including a 
+    (the minute from and to (example: (1-2))- the text in this minute) 
+    Use the minute to know from the stopped time of the video where is the specific time the user talking about and 
     responding with data relevant to that time (like if he asked to illustrate last 5 mins)).
-    to understand the concept, from the given stopped time search the stopped time in between the specific start times given in the transcript
-    (as an example: if the the stopped time = 215.25 and there is two start times = 212.50 and 217.8 so choose the first start 212.50
-    and choose the text in this start and respond using it and all its previous or after texts based on the user question) and respond,
-    like if the user asked: 'can you test my knowledge from what I heard so far', you should know where he stopped what is the part
+    or asked: 'can you test my knowledge from what I heard so far', you should know where he stopped , what is the part
     is he asking about, so you should respond here with knowing the text that he stopped at and all the previous texts from the transcript
     the transcript and the stopped time are given above so don't ask the user about them.
     After all of these you should be able to respond to any question related to the video so don't tell the user 
@@ -130,31 +127,36 @@ def ConversationChainWithMemory(video_data, stopped_time):
 
 def get_video_data_txt(csv_file, video_id):
     """
-    Function to read a CSV file and retrieve text data along with start and duration for a given video_id.
+    Function to read a CSV file and retrieve text data grouped by minute for a given video_id.
 
     Parameters:
     csv_file (str): Path to the CSV file.
     video_id (str): ID of the video to retrieve data for.
 
     Returns:
-    str: String containing the transcript data formatted as text, start, and duration.
+    dict: Dictionary containing the transcript data grouped by minute.
     """
     try:
-        # Read the CSV file into a DataFrame
+    # Read the CSV file into a DataFrame
         df = pd.read_csv(csv_file)
 
         # Filter the DataFrame to get data for the given video_id
         video_data = df[df['video_id'] == video_id]
 
-        # Initialize a string to hold the transcript data
-        transcript_data = f"Transcript of Video ID: {video_id}\n\n"
+        # Initialize a dictionary to hold the transcript data
+        transcript_dict = {}
 
-        # Iterate over the rows and append each entry as text, start, and duration
+        # Iterate over the rows and group text by minute
         for index, row in video_data.iterrows():
-            transcript_data += f"Text: {row['text']}\n"
-            transcript_data += f"Start: {row['start']}\n\n"
+            minute = row['minute']
+            text = row['text']
 
-        return transcript_data
+            if minute in transcript_dict:
+                transcript_dict[minute] += f" {text}"
+            else:
+                transcript_dict[minute] = text
+
+        return transcript_dict
     
     except FileNotFoundError:
         print(f"Error: File '{csv_file}' not found.")
@@ -245,7 +247,7 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
 
         use_scenario = False
         global conversation
-        csv_file = "video_data/videos_transcript.csv"
+        csv_file = "video_data/reformatted_transcript.csv"
         video_data = get_video_data_txt(csv_file, video_id)
         
         if conversation is None:
