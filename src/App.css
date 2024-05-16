@@ -334,3 +334,6 @@ textarea {
     user-select: none;
 
 }
+.display-none{
+    display: none;
+}

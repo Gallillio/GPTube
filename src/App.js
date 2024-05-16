@@ -1,6 +1,7 @@
     import './App.css';
     import userProfilePicture from './assets/user-icon.png';
     import gptImageLogo from './assets/chatgptLogo.svg'
+    import gptTubeLogo from './assets/GPTUBE_Logo_Black-removebg-preview.png'
     import React, { useState, useEffect, useRef } from 'react';
     import Video from './Video'; // Import MovieClip component
     import quizScenario from './quiz_scenario_JSON.json'
@@ -367,7 +368,7 @@ function App() {
             
             <div className="middle-section">
                            
-                {!welcomePageDisplayed ? <div ><div className='welcomePageContainer'>👋</div><div className='paragraph'>To start ask the Model </div></div> 
+                {!welcomePageDisplayed ? <div ><div style={{ display: 'none' }}><Video  /></div><img src={ gptTubeLogo} alt=""  /><div className='paragraph'>To start ask the Model </div><div className='welcomePageContainer'>👋</div></div> 
                 :<div className='center-video'>
                     <Video />
                 </div> 
