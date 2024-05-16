@@ -2,7 +2,8 @@
     display: flex;
     height: 100vh;
     background-color: var(--incoming-chat-bg);
-
+/* background: rgb(116,247,204);
+background: radial-gradient(circle, rgba(116,247,204,1) 0%, rgba(148,187,233,1) 100%); */
   }
   
   .left-section {
@@ -12,10 +13,11 @@
   
   .left-section.open {
     width: 150px; /* Adjust as needed */
-    height: 98vh;
-    background-color: #444654;
-    border-right: #D9D9E3 solid 1px;
+    height: 100vh;
+    background-color:var(--incoming-chat-bg);
+    border-right: #baf2fc solid 0.5px;
     max-width: 150px;
+
 
 
   }
@@ -98,10 +100,11 @@
 }
 
 .left-section-lower-part{
-    border: 4px solid rgb(224, 201, 201);
+    /* border: 4px solid rgb(224, 201, 201); */
     /* margin-top: 70%; */
     align-items:baseline;
     margin-top: 69vh;
+
 
 }
 
@@ -116,6 +119,8 @@
 
 .left-section-icons{
     display: flex;
+    border: #D9D9E3 1px solid;
+    
 }
 .left-section-font{
     font-size: 17px;
