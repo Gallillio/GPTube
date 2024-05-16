@@ -85,7 +85,7 @@ def GetTimeAndID(request):
 
 ### SCENARIOS ###
 def GetGenerateQuizJson(request, input):
-    csv_file = "video_data/videos_transcript.csv"
+    csv_file = "video_data/reformatted_transcript.csv"
     if request.method == 'GET':
         video_id = request.GET.get('videoId')
         Quiz = GenerateQuizJson(video_id, csv_file, input)
