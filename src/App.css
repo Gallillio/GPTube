@@ -7,14 +7,17 @@
   
   .left-section {
     width: 0;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease-in-out;
   }
   
   .left-section.open {
-    width: 200px; /* Adjust as needed */
+    width: 150px; /* Adjust as needed */
     height: 98vh;
-    background-color:var(--blur);
-    
+    background-color: #444654;
+    border-right: #D9D9E3 solid 1px;
+    max-width: 150px;
+
+
   }
   
 
@@ -24,11 +27,13 @@
   
   .burger-menu {
     cursor: pointer;
-    padding: 10px;
+    padding-right: 30px;
     /* background-color: var(--blur); */
     color: white;
     position: flex;
-  }
+    z-index: 99 !important;
+    justify-content:flex-end; 
+}
 
   /* Import Google font - Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
@@ -93,7 +98,11 @@
 }
 
 .left-section-lower-part{
-    /* border: 4px solid red; */
+    border: 4px solid rgb(224, 201, 201);
+    /* margin-top: 70%; */
+    align-items:baseline;
+    margin-top: 69vh;
+
 }
 
 .left-section-top-part{
@@ -107,7 +116,6 @@
 
 .left-section-icons{
     display: flex;
-    margin-top: 10px;
 }
 .left-section-font{
     font-size: 17px;
@@ -188,6 +196,7 @@
     border-radius: 80px;
     width: 100px;
     user-select: none;
+    margin-left: 1vh;
 
 }
 
@@ -288,18 +297,24 @@ textarea {
     padding: 10px;
     /* background-color: var(--blur); */
     color: white;
+    z-index: 99 !important;
+    justify-content: flex-end;
+
 }
 
 .welcomePageContainer{
     justify-content: center;
     align-items: center;
-    padding-left: 30%;
-    padding-top: 20%;
-    font-size: 100px;
+    /* padding-top: 10%; */
+    /* margin-bottom: 70%; */
+    font-size: 20px;
     user-select: none;
     animation: waving-hands 2.5s infinite;
     transform-origin: 70% 70%;
     display: inline-block;
+    z-index: 99 !important;
+    /* border: red 1px solid; */
+
 }
 @keyframes waving-hands {
     0% {
@@ -329,11 +344,15 @@ textarea {
 }
 .paragraph{
     font-size: large;
-    margin-top: 10%;
-    margin-left: 25%;
+    /* margin-top: 50%; */
+    margin-left: 30%;
     user-select: none;
-
+    z-index: 99 !important;
 }
 .display-none{
     display: none;
+}
+.welcome-logo{
+    margin-top: 40%;
+    margin-left: 20%;
 }

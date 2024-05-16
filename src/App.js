@@ -1,5 +1,5 @@
     import './App.css';
-    import userProfilePicture from './assets/user-icon.png';
+    import userProfilePicture from './assets/elpopicon.jpg';
     import gptImageLogo from './assets/chatgptLogo.svg'
     import gptTubeLogo from './assets/GPTUBE_Logo_Black-removebg-preview.png'
     import React, { useState, useEffect, useRef } from 'react';
@@ -14,7 +14,7 @@
 const LeftSection = ({ isOpen ,isLeftOpen }) => {
     return (
       <div className={`left-section ${isOpen ? 'open' : ''}`}>
-        {!isLeftOpen ? <button className='send material-symbols-rounded hover burger-menu'> menu </button> : <button className=' send material-symbols-rounded burger-menu-opened'>menu_open</button>}
+        {!isLeftOpen ? <button className='send material-symbols-rounded hover burger-menu'> menu </button> : <button className='send material-symbols-rounded burger-menu-opened'>menu_open</button>}
 
         {isOpen && ( // Conditionally render content only when isOpen is true
           <div className='left-section'>
@@ -368,7 +368,7 @@ function App() {
             
             <div className="middle-section">
                            
-                {!welcomePageDisplayed ? <div ><div style={{ display: 'none' }}><Video  /></div><img src={ gptTubeLogo} alt=""  /><div className='paragraph'>To start ask the Model </div><div className='welcomePageContainer'>👋</div></div> 
+                {!welcomePageDisplayed ? <div ><div style={{ display: 'none' }}><Video  /></div><img src={ gptTubeLogo} alt=""  className='welcome-logo'/><div className='paragraph'>To start ask the Model<div className='welcomePageContainer'>👋</div> </div></div> 
                 :<div className='center-video'>
                     <Video />
                 </div> 
