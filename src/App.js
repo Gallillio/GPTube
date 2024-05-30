@@ -21,6 +21,9 @@ const LeftSection = ({ isOpen ,isLeftOpen }) => {
           <div className="left-section-top-part">
               <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
           </div>
+          {/* <div>
+            <button onClick={}></button>
+          </div> */}
 
           <div className="left-section-lower-part">
               <div className='left-section-icons'>
@@ -355,7 +358,7 @@ function App() {
     const toggleLeft = () => {
         setIsLeftOpen(!isLeftOpen);
     };
-
+    // change the video id by clicking 
     return (
         <div className="app">
         <div className="burger-menu" onClick={toggleLeft}>
