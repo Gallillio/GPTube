@@ -36,23 +36,16 @@ const LeftSection = ({ isOpen, isLeftOpen }) => {
                 :
                 <button className='send material-symbols-rounded burger-menu-opened'>menu_open</button>}
 
-<<<<<<< Updated upstream
-        {isOpen && ( // Conditionally render content only when isOpen is true
-          <div className='left-section'>
-          <div className="left-section-top-part">
-              <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
-          </div>
-          {/* <div>
-            <button onClick={}></button>
-          </div> */}
-=======
+
+
+
             {isOpen && ( // Conditionally render content only when isOpen is true
                 <div className='left-section'>
                     <div className="left-section-top-part">
                         <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
                     </div>
                     <hr />
->>>>>>> Stashed changes
+
 
                     <div>
                         <button value="Ki2iHgKxRBo" onClick={(e) => ChangeVideoEvent(e.target.value)}> Video1 </button>
