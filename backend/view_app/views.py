@@ -138,7 +138,17 @@ def GetQuizAnswers(request):
         gpt_response = QuizAsContext(response_message, stopped_time)
 
         return JsonResponse({"quiz_scenario_user_answers_response": gpt_response})
-    
+
+def ChangeVideoID(request):
+    if request.method == 'GET':
+        video_id = request.GET.get('videoId')
+        
+        print("\n\n\n\n")
+        print(video_id)
+        print("\n\n\n\n")
+
+        return JsonResponse({"videoIdChangedSucessful": True})
+
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))
 # stopped_time = time_and_id_response.get('Stopped_Time', stopped_time)
 # video_id = time_and_id_response.get('Video_ID', video_id)

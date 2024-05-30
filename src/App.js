@@ -1,21 +1,42 @@
-    import './App.css';
-    import userProfilePicture from './assets/elpopicon.jpg';
-    import gptImageLogo from './assets/chatgptLogo.svg'
-    import gptTubeLogo from './assets/GPTUBE_Logo_Black-removebg-preview.png'
-    import React, { useState, useEffect, useRef } from 'react';
-    import Video from './Video'; // Import MovieClip component
-    import quizScenario from './quiz_scenario_JSON.json'
+import './App.css';
+import userProfilePicture from './assets/elpopicon.jpg';
+import gptImageLogo from './assets/chatgptLogo.svg'
+import gptTubeLogo from './assets/GPTUBE_Logo_Black-removebg-preview.png'
+import React, { useState, useEffect, useRef } from 'react';
+import Video from './Video'; // Import MovieClip component
+import quizScenario from './quiz_scenario_JSON.json'
 
-    import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
+import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
 
-    const speechKey = process.env.REACT_APP_SPEECH_KEY;
-    const speechRegion = process.env.REACT_APP_SPEECH_REGION;
+const speechKey = process.env.REACT_APP_SPEECH_KEY;
+const speechRegion = process.env.REACT_APP_SPEECH_REGION;
+
+//change video section
+const ChangeVideoEvent = (videoId) => {
+    // console.log("aaaaaaaaaaaaaaaa - ", videoId);
+
+    fetch(`http://127.0.0.1:8000/ChangeVideoID/?videoId=${videoId}`)
+        .then(res => res.json())
+        .then(
+            (result) => {
+                console.log(result.videoIdChangedSucessful)
+            },
+            (error) => {
+                console.log("handle generate quiz aint working you dumb fu")
+            }
+        )
+
+}
+
 // Left section component
-const LeftSection = ({ isOpen ,isLeftOpen }) => {
+const LeftSection = ({ isOpen, isLeftOpen }) => {
     return (
-      <div className={`left-section ${isOpen ? 'open' : ''}`}>
-        {!isLeftOpen ? <button className='send material-symbols-rounded hover burger-menu'> menu </button> : <button className='send material-symbols-rounded burger-menu-opened'>menu_open</button>}
+        <div className={`left-section ${isOpen ? 'open' : ''}`}>
+            {!isLeftOpen ? <button className='send material-symbols-rounded hover burger-menu'> menu </button>
+                :
+                <button className='send material-symbols-rounded burger-menu-opened'>menu_open</button>}
 
+<<<<<<< Updated upstream
         {isOpen && ( // Conditionally render content only when isOpen is true
           <div className='left-section'>
           <div className="left-section-top-part">
@@ -24,21 +45,35 @@ const LeftSection = ({ isOpen ,isLeftOpen }) => {
           {/* <div>
             <button onClick={}></button>
           </div> */}
+=======
+            {isOpen && ( // Conditionally render content only when isOpen is true
+                <div className='left-section'>
+                    <div className="left-section-top-part">
+                        <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
+                    </div>
+                    <hr />
+>>>>>>> Stashed changes
 
-          <div className="left-section-lower-part">
-              <div className='left-section-icons'>
-                  <span className='material-symbols-rounded left-section-icon-size'> Settings </span> Settings
-              </div>
-              <div className='left-section-icons'>
-                  <span className='material-symbols-rounded left-section-icon-size'> Logout </span> Logout
-              </div>
-          </div>
-      </div>
-        )}
-      </div>
+                    <div>
+                        <button value="Ki2iHgKxRBo" onClick={(e) => ChangeVideoEvent(e.target.value)}> Video1 </button>
+                        <button value="DZa0puxLd9w" onClick={(e) => ChangeVideoEvent(e.target.value)}> Video2 </button>
+                        <button value="R0OA5e1tFhA" onClick={(e) => ChangeVideoEvent(e.target.value)}> Video3 </button>
+                    </div>
+
+                    {/* <div className="left-section-lower-part">
+                        <div className='left-section-icons'>
+                            <span className='material-symbols-rounded left-section-icon-size'> Settings </span> Settings
+                        </div>
+                        <div className='left-section-icons'>
+                            <span className='material-symbols-rounded left-section-icon-size'> Logout </span> Logout
+                        </div>
+                    </div> */}
+                </div>
+            )}
+        </div>
     );
-  };
-  
+};
+
 // Middle section component
 
 
@@ -125,234 +160,232 @@ function App() {
     }
 
     const HandleSend = async () => {
-                if (input.trim().length !== 0) {
-                    console.log("input ", input)
-                    queryResponse();
-                } else {
-                    console.log("Input field is empty")
-                }
-                // queryResponse();
-                setIsWelcompageDisplayed(true)
-            }
-            
-            const handleEnter = async (e) => {
-                if (e.key === "Enter") await HandleSend();
-            }
-    
-            /// scroll down button start 
-            const chatContainerRef = useRef(null);
-            const scrollToBottom = () => {
-                if (chatContainerRef.current) {
-                    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-                }
-            };
-    
-            useEffect(() => {
-                scrollToBottom();
-            })
-    
-            /// Text to speech section
-            const [isTextToSpeeching, setIsTextToSpeeching] = useState(false);
-            const subscriptionKey = "b0f5184c6c2242f78356246fb06082f9";
-            const serviceRegion = "eastus";
-            const SpeechSDK = window.SpeechSDK;
-            var synthesizer;
-    
-            var textToSpeechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
-            var player = new SpeechSDK.SpeakerAudioDestination();
-            var audioConfigTextToSpeech = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
-            synthesizer = new SpeechSDK.SpeechSynthesizer(textToSpeechConfig, audioConfigTextToSpeech);
-            const stopTextToSpeech = () => {
-                //turn off speech to text
-                setIsTextToSpeeching(false);
-                console.log("Stop text to speech");
-            }
+        if (input.trim().length !== 0) {
+            console.log("input ", input)
+            queryResponse();
+        } else {
+            console.log("Input field is empty")
+        }
+        // queryResponse();
+        setIsWelcompageDisplayed(true)
+    }
 
-                const resumeTextToSpeech = () => {
-            //turn on speech to text
-            setIsTextToSpeeching(true);
-            console.log("resume text to speech");
+    const handleEnter = async (e) => {
+        if (e.key === "Enter") await HandleSend();
+    }
+
+    /// scroll down button start 
+    const chatContainerRef = useRef(null);
+    const scrollToBottom = () => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    })
+
+    /// Text to speech section
+    const [isTextToSpeeching, setIsTextToSpeeching] = useState(false);
+    const subscriptionKey = "b0f5184c6c2242f78356246fb06082f9";
+    const serviceRegion = "eastus";
+    const SpeechSDK = window.SpeechSDK;
+    var synthesizer;
+
+    var textToSpeechConfig = SpeechSDK.SpeechConfig.fromSubscription(subscriptionKey, serviceRegion);
+    var player = new SpeechSDK.SpeakerAudioDestination();
+    var audioConfigTextToSpeech = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+    synthesizer = new SpeechSDK.SpeechSynthesizer(textToSpeechConfig, audioConfigTextToSpeech);
+    const stopTextToSpeech = () => {
+        //turn off speech to text
+        setIsTextToSpeeching(false);
+        console.log("Stop text to speech");
+    }
+
+    const resumeTextToSpeech = () => {
+        //turn on speech to text
+        setIsTextToSpeeching(true);
+        console.log("resume text to speech");
+    }
+
+    const HandleTextToSpeech = (response) => {
+        // Text to speech for GPT result of user query
+        player.onAudioEnd = () => {
+            console.log("Finished speaking");
+        };
+
+        // synthesizer = new SpeechSDK.SpeechSynthesizer(textToSpeechConfig, SpeechSDK.AudioConfig.fromDefaultSpeakerOutput());
+
+        if (isTextToSpeeching) {
+            synthesizer.speakTextAsync(
+                response,
+                function (result) {
+                    if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
+                        console.log("Done Text to speeching");
+                    } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
+                        console.log("cancelled text to speeching");
+
+                    }
+                    // window.console.log(result);
+                    synthesizer.close();
+                    synthesizer = undefined;
+                },
+                function (err) {
+                    window.console.log(err);
+                    synthesizer.close();
+                    synthesizer = undefined;
+                }
+            );
         }
 
-        const HandleTextToSpeech = (response) => {
-            // Text to speech for GPT result of user query
-            player.onAudioEnd = () => {
-                console.log("Finished speaking");
-            };
+    }
 
-            // synthesizer = new SpeechSDK.SpeechSynthesizer(textToSpeechConfig, SpeechSDK.AudioConfig.fromDefaultSpeakerOutput());
+    /// Speech to Text Section
+    const [isListening, setIsListening] = useState(true);
+    const speechToTextConfig = useRef(null);
+    const audioConfigSpeechToText = useRef(null);
+    const recognizer = useRef(null);
 
-            if (isTextToSpeeching) {
-                synthesizer.speakTextAsync(
-                    response,
-                    function (result) {
-                        if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
-                            console.log("Done Text to speeching");
-                        } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
-                            console.log("cancelled text to speeching");
+    const [myTranscript, setMyTranscript] = useState("");
+    const [RecTranscript, setRecTranscript] = useState("");
 
-                        }
-                        // window.console.log(result);
-                        synthesizer.close();
-                        synthesizer = undefined;
-                    },
-                    function (err) {
-                        window.console.log(err);
-                        synthesizer.close();
-                        synthesizer = undefined;
-                    }
-                );
-            }
+    useEffect(() => {
+        speechToTextConfig.current = sdk.SpeechConfig.fromSubscription(
+            speechKey,
+            speechRegion
+        );
+        speechToTextConfig.current.speechRecognitionLanguage = 'en-US';
 
-        }
+        audioConfigSpeechToText.current = sdk.AudioConfig.fromDefaultMicrophoneInput();
+        recognizer.current = new sdk.SpeechRecognizer(
+            speechToTextConfig.current,
+            audioConfigSpeechToText.current
+        );
 
-            /// Speech to Text Section
-        const [isListening, setIsListening] = useState(true);
-        const speechToTextConfig = useRef(null);
-        const audioConfigSpeechToText = useRef(null);
-        const recognizer = useRef(null);
+        const processRecognizedTranscript = (event) => {
+            const result = event.result;
 
-        const [myTranscript, setMyTranscript] = useState("");
-        const [RecTranscript, setRecTranscript] = useState("");
+            if (result.reason === sdk.ResultReason.RecognizedSpeech) {
+                stopListening();
+                // HandleSend();
 
-        useEffect(() => {
-            speechToTextConfig.current = sdk.SpeechConfig.fromSubscription(
-                speechKey,
-                speechRegion
-            );
-            speechToTextConfig.current.speechRecognitionLanguage = 'en-US';
-
-            audioConfigSpeechToText.current = sdk.AudioConfig.fromDefaultMicrophoneInput();
-            recognizer.current = new sdk.SpeechRecognizer(
-                speechToTextConfig.current,
-                audioConfigSpeechToText.current
-            );
-
-            const processRecognizedTranscript = (event) => {
-                const result = event.result;
-
-                if (result.reason === sdk.ResultReason.RecognizedSpeech) {
-                    stopListening();
-                    // HandleSend();
-
-                    const transcript = result.text;
-                    console.log('Transcript: -->', transcript);
-                    var trimmed_transcript = transcript.toLowerCase();
-                    trimmed_transcript = trimmed_transcript.replace(",", " ")
-                    trimmed_transcript = trimmed_transcript.replace(".", " ")
-                    trimmed_transcript = trimmed_transcript.replace(/\s/g, "");
-                    trimmed_transcript = trimmed_transcript.trim();
+                const transcript = result.text;
+                console.log('Transcript: -->', transcript);
+                var trimmed_transcript = transcript.toLowerCase();
+                trimmed_transcript = trimmed_transcript.replace(",", " ")
+                trimmed_transcript = trimmed_transcript.replace(".", " ")
+                trimmed_transcript = trimmed_transcript.replace(/\s/g, "");
+                trimmed_transcript = trimmed_transcript.trim();
 
 
-                    // console.log('Transcript: -->', trimmed_transcript);
-                    // Call a function to process the transcript as needed
-                    if (
-                        trimmed_transcript === "heygptube" || trimmed_transcript === "heygbtube" || trimmed_transcript === "stop"
-                        || trimmed_transcript === "stopvideo" || trimmed_transcript === "stopthevideo"
-                    ) {
-                        console.log("IS THIS WORKING");
-                        alert('Button clicked!')
-                    }
+                // console.log('Transcript: -->', trimmed_transcript);
+                // Call a function to process the transcript as needed
+                if (
+                    trimmed_transcript === "heygptube" || trimmed_transcript === "heygbtube" || trimmed_transcript === "stop"
+                    || trimmed_transcript === "stopvideo" || trimmed_transcript === "stopthevideo"
+                ) {
+                    console.log("IS THIS WORKING");
+                    alert('Button clicked!')
                 }
-            };
-
-            const processRecognizingTranscript = (event) => {
-                const result = event.result;
-                // console.log('Recognition result:', result);
-                if (result.reason === sdk.ResultReason.RecognizingSpeech) {
-                    const transcript = result.text;
-                    // console.log('Transcript: -->', transcript);
-                    // Call a function to process the transcript as needed
-                    setinput(transcript)
-
-                    setRecTranscript(transcript);
-                }
-            }
-
-            recognizer.current.recognized = (s, e) => processRecognizedTranscript(e);
-            recognizer.current.recognizing = (s, e) => processRecognizingTranscript(e);
-
-
-            recognizer.current.startContinuousRecognitionAsync(() => {
-                console.log('Speech recognition started.');
-                setIsListening(true);
-            });
-
-            return () => {
-                recognizer.current.stopContinuousRecognitionAsync(() => {
-                    setIsListening(false);
-                });
-            };
-        }, []);
-
-        const resumeListening = () => {
-            console.log(isListening)
-
-            if (!isListening) {
-                setIsListening(true);
-                recognizer.current.startContinuousRecognitionAsync(() => {
-                    console.log('Resumed listening...');
-                });
             }
         };
 
-        const stopListening = () => {
-            console.log(isListening)
+        const processRecognizingTranscript = (event) => {
+            const result = event.result;
+            // console.log('Recognition result:', result);
+            if (result.reason === sdk.ResultReason.RecognizingSpeech) {
+                const transcript = result.text;
+                // console.log('Transcript: -->', transcript);
+                // Call a function to process the transcript as needed
+                setinput(transcript)
 
-            setIsListening(false);
+                setRecTranscript(transcript);
+            }
+        }
+
+        recognizer.current.recognized = (s, e) => processRecognizedTranscript(e);
+        recognizer.current.recognizing = (s, e) => processRecognizingTranscript(e);
+
+
+        recognizer.current.startContinuousRecognitionAsync(() => {
+            console.log('Speech recognition started.');
+            setIsListening(true);
+        });
+
+        return () => {
             recognizer.current.stopContinuousRecognitionAsync(() => {
-                console.log('Speech recognition stopped.');
+                setIsListening(false);
             });
         };
+    }, []);
 
-        // increase input chat size
-        const chatInputRef = useRef(null);
-        useEffect(() => {
-            // chatInputRef.current.style.height = "auto";
-            // chatInputRef.current.style.height = chatInputRef.current.scrollHeight + "px";
-        }, [input])
+    const resumeListening = () => {
+        console.log(isListening)
 
-        //Quiz scenario
-        const handleGenerateQuizScenario = () => {
-            const SrcSplit = document.querySelector('.video-style').src.split('/')
-            const videoId = SrcSplit[SrcSplit.length - 1].split('?')[0]
-            fetch(`http://127.0.0.1:8000/GetGenerateQuizJson/?videoId=${videoId}`)
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        console.log(result.quiz)
-                    },
-                    (error) => {
-                        console.log("handle generate quiz aint working you dumb fu")
-                    }
-                )
+        if (!isListening) {
+            setIsListening(true);
+            recognizer.current.startContinuousRecognitionAsync(() => {
+                console.log('Resumed listening...');
+            });
         }
-        const handleQuizScenarioAnswers = (e) => {
-            e.preventDefault(); // prevents page from refreshing on submit
+    };
 
-            const quiz_scenario_data = new FormData(e.target);
-            const quiz_scenario_OBJECT = Object.fromEntries(quiz_scenario_data.entries());
-            const quiz_scenario_JSON = JSON.stringify(quiz_scenario_OBJECT);
+    const stopListening = () => {
+        console.log(isListening)
 
-            fetch("http://127.0.0.1:8000/GetQuizAnswers/?quiz_scenario_user_answers=" + quiz_scenario_JSON)
-                .then(res => res.json())
-                .then(
-                    (result) => {
-                        console.log(result.quiz_scenario_user_answers_response);
+        setIsListening(false);
+        recognizer.current.stopContinuousRecognitionAsync(() => {
+            console.log('Speech recognition stopped.');
+        });
+    };
 
-                        setMessages([
-                            ...messages,
-                            { text: result.quiz_scenario_user_answers_response, isBot: true },
-                        ]);
-                    },
-                    (error) => {
-                        console.log("error fel quiz yasta");
-                    }
-                );
-        };
+    // increase input chat size
+    const chatInputRef = useRef(null);
+    useEffect(() => {
+        // chatInputRef.current.style.height = "auto";
+        // chatInputRef.current.style.height = chatInputRef.current.scrollHeight + "px";
+    }, [input])
 
-    
-    
+    //Quiz scenario
+    const handleGenerateQuizScenario = () => {
+        const SrcSplit = document.querySelector('.video-style').src.split('/')
+        const videoId = SrcSplit[SrcSplit.length - 1].split('?')[0]
+        fetch(`http://127.0.0.1:8000/GetGenerateQuizJson/?videoId=${videoId}`)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result.quiz)
+                },
+                (error) => {
+                    console.log("handle generate quiz aint working you dumb fu")
+                }
+            )
+    }
+    const handleQuizScenarioAnswers = (e) => {
+        e.preventDefault(); // prevents page from refreshing on submit
+
+        const quiz_scenario_data = new FormData(e.target);
+        const quiz_scenario_OBJECT = Object.fromEntries(quiz_scenario_data.entries());
+        const quiz_scenario_JSON = JSON.stringify(quiz_scenario_OBJECT);
+
+        fetch("http://127.0.0.1:8000/GetQuizAnswers/?quiz_scenario_user_answers=" + quiz_scenario_JSON)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    console.log(result.quiz_scenario_user_answers_response);
+
+                    setMessages([
+                        ...messages,
+                        { text: result.quiz_scenario_user_answers_response, isBot: true },
+                    ]);
+                },
+                (error) => {
+                    console.log("error fel quiz yasta");
+                }
+            );
+    };
+
     const [isLeftOpen, setIsLeftOpen] = useState(false);
 
     const toggleLeft = () => {
@@ -361,22 +394,19 @@ function App() {
     // change the video id by clicking 
     return (
         <div className="app">
-        <div className="burger-menu" onClick={toggleLeft}>
-            {/* &#9776; */}
-            <LeftSection className='burger-menu-opened' isOpen={isLeftOpen} />
-        </div>
-         
-         {/* <MiddleSection />
-        <RightSection />  */}
-            
+            <div className="burger-menu" onClick={toggleLeft}>
+                {/* &#9776; */}
+                <LeftSection className='burger-menu-opened' isOpen={isLeftOpen} />
+            </div>
+
             <div className="middle-section">
-                           
-                {!welcomePageDisplayed ? <div ><div style={{ display: 'none' }}><Video  /></div><img src={ gptTubeLogo} alt=""  className='welcome-logo'/><div className='paragraph'>To start ask the Model<div className='welcomePageContainer'>👋</div> </div></div> 
-                :<div className='center-video'>
-                    <Video />
-                </div> 
-                
-                    }
+
+                {!welcomePageDisplayed ? <div ><div style={{ display: 'none' }}><Video /></div><img src={gptTubeLogo} alt="" className='welcome-logo' /><div className='paragraph'>To start ask the Model<div className='welcomePageContainer'>👋</div> </div></div>
+                    : <div className='center-video'>
+                        <Video />
+                    </div>
+
+                }
 
                 {/* displays scenariio box when  displayScenarioBox == true*/}
                 {!displayScenarioBox ?
