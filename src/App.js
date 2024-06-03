@@ -12,24 +12,23 @@ const speechKey = process.env.REACT_APP_SPEECH_KEY;
 const speechRegion = process.env.REACT_APP_SPEECH_REGION;
 
 //change video section
-const ChangeVideoEvent = (videoId) => {
-    // console.log("aaaaaaaaaaaaaaaa - ", videoId);
+// const ChangeVideoEvent = (videoId) => {
 
-    fetch(`http://127.0.0.1:8000/ChangeVideoID/?videoId=${videoId}`)
-        .then(res => res.json())
-        .then(
-            (result) => {
-                console.log(result.videoIdChangedSucessful)
-            },
-            (error) => {
-                console.log("handle generate quiz aint working you dumb fu")
-            }
-        )
+//     fetch(`http://127.0.0.1:8000/ChangeVideoID/?videoId=${videoId}`)
+//         .then(res => res.json())
+//         .then(
+//             (result) => {
+//                 console.log(result.videoIdChangedSucessful)
+//             },
+//             (error) => {
+//                 console.log("handle generate quiz aint working you dumb fu")
+//             }
+//         )
 
-}
+// }
 
 // Left section component
-const LeftSection = ({ isOpen, isLeftOpen }) => {
+const LeftSection = ({ isOpen, isLeftOpen, ChangeVideoEvent }) => {
     return (
         <div className={`left-section ${isOpen ? 'open' : ''}`}>
             {!isLeftOpen ? <button className='send material-symbols-rounded hover burger-menu'> menu </button>
@@ -383,21 +382,29 @@ function App() {
     const toggleLeft = () => {
         setIsLeftOpen(!isLeftOpen);
     };
+
     // change the video id by clicking 
+    const [videoId, setVideoId] = useState('mpU84OJ5vdQ'); // Default video ID
+
+    const ChangeVideoEvent = (id) => {
+        setVideoId(id);
+        setIsWelcompageDisplayed(true)
+
+    };
+
     return (
         <div className="app">
             <div className="burger-menu" onClick={toggleLeft}>
                 {/* &#9776; */}
-                <LeftSection className='burger-menu-opened' isOpen={isLeftOpen} />
+                <LeftSection className='burger-menu-opened' isOpen={isLeftOpen} ChangeVideoEvent={ChangeVideoEvent} />
             </div>
 
             <div className="middle-section">
 
                 {!welcomePageDisplayed ? <div ><div style={{ display: 'none' }}><Video /></div><img src={gptTubeLogo} alt="" className='welcome-logo' /><div className='paragraph'>To start ask the Model<div className='welcomePageContainer'>👋</div> </div></div>
                     : <div className='center-video'>
-                        <Video />
+                        <Video videoId={videoId} />
                     </div>
-
                 }
 
                 {/* displays scenariio box when  displayScenarioBox == true*/}

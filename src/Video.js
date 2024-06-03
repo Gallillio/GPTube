@@ -53,9 +53,12 @@ class Video extends React.Component {
       },
     };
 
+    const aa = this.props.videoId
+
     return (
       <div>
-        <YouTube videoId="IX0iGf2wYM0" opts={options} onPause={this._onPause} iframeClassName={"video-style"} />
+        {console.log("id is: " + this.props.videoId)}
+        <YouTube videoId={aa} opts={options} onPause={this._onPause} iframeClassName={"video-style"} />
         {/* You can display the stopped time if needed */}
         {/* {this.state.stoppedTime && <p>Video stopped at: {this.state.stoppedTime}</p>} */}
       </div>
