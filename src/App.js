@@ -36,21 +36,20 @@ const LeftSection = ({ isOpen, isLeftOpen }) => {
                 :
                 <button className='send material-symbols-rounded burger-menu-opened'>menu_open</button>}
 
-
-
-
             {isOpen && ( // Conditionally render content only when isOpen is true
                 <div className='left-section'>
                     <div className="left-section-top-part">
                         <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
                     </div>
+
                     <hr />
 
+                    <b> Select your video </b>
 
                     <div>
-                        <button value="Ki2iHgKxRBo" onClick={(e) => ChangeVideoEvent(e.target.value)}> Video1 </button>
-                        <button value="DZa0puxLd9w" onClick={(e) => ChangeVideoEvent(e.target.value)}> Video2 </button>
-                        <button value="R0OA5e1tFhA" onClick={(e) => ChangeVideoEvent(e.target.value)}> Video3 </button>
+                        <button value="Ki2iHgKxRBo" onClick={(e) => ChangeVideoEvent(e.target.value)}> Supervised Learning - Georgia Tech - Machine Learning </button>
+                        <button value="IX0iGf2wYM0" onClick={(e) => ChangeVideoEvent(e.target.value)}> ID3 - Georgia Tech - Machine Learning </button>
+                        <button value="mpU84OJ5vdQ" onClick={(e) => ChangeVideoEvent(e.target.value)}> KNN - Georgia Tech - Machine Learning </button>
                     </div>
 
                     {/* <div className="left-section-lower-part">

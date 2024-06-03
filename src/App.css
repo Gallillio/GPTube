@@ -6,10 +6,6 @@
 background: radial-gradient(circle, rgba(116,247,204,1) 0%, rgba(148,187,233,1) 100%); */
   }
   
-  .left-section {
-    width: 0;
-    transition: width 0.3s ease-in-out;
-  }
   
   .left-section.open {
     width: 150px; /* Adjust as needed */
@@ -87,6 +83,10 @@ background: radial-gradient(circle, rgba(116,247,204,1) 0%, rgba(148,187,233,1) 
 }
 
 .left-section{
+    width: 16vh;
+    transition: width 0.3s ease-in-out;
+    padding: 5px;
+
     /* border: 3px solid red; */
     /* width: 20%; */
     /* font-size: 20px;
