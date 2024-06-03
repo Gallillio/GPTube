@@ -11,24 +11,12 @@ import * as sdk from 'microsoft-cognitiveservices-speech-sdk';
 const speechKey = process.env.REACT_APP_SPEECH_KEY;
 const speechRegion = process.env.REACT_APP_SPEECH_REGION;
 
-//change video section
-// const ChangeVideoEvent = (videoId) => {
-
-//     fetch(`http://127.0.0.1:8000/ChangeVideoID/?videoId=${videoId}`)
-//         .then(res => res.json())
-//         .then(
-//             (result) => {
-//                 console.log(result.videoIdChangedSucessful)
-//             },
-//             (error) => {
-//                 console.log("handle generate quiz aint working you dumb fu")
-//             }
-//         )
-
-// }
-
 // Left section component
-const LeftSection = ({ isOpen, isLeftOpen, ChangeVideoEvent }) => {
+var video_list_string = "{}"
+
+const LeftSection = ({ isOpen, isLeftOpen, ChangeVideoEvent, RefreshVideoSelection }) => {
+    const video_list_json = JSON.parse(video_list_string);
+
     return (
         <div className={`left-section ${isOpen ? 'open' : ''}`}>
             {!isLeftOpen ? <button className='send material-symbols-rounded hover burger-menu'> menu </button>
@@ -36,42 +24,37 @@ const LeftSection = ({ isOpen, isLeftOpen, ChangeVideoEvent }) => {
                 <button className='send material-symbols-rounded burger-menu-opened'>menu_open</button>}
 
             {isOpen && ( // Conditionally render content only when isOpen is true
-                <div className='left-section'>
+                <div className='left-section select-video-section'>
                     <div className="left-section-top-part">
                         <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
                     </div>
+                    El King <br />
 
+                    <button onClick={RefreshVideoSelection}>Refresh Video List</button>
+
+                    <br />
+                    <br />
                     <hr />
 
                     <b> Select your video </b>
 
                     <div>
-                        <button value="Ki2iHgKxRBo" onClick={(e) => ChangeVideoEvent(e.target.value)}> Supervised Learning - Georgia Tech - Machine Learning </button>
-                        <button value="IX0iGf2wYM0" onClick={(e) => ChangeVideoEvent(e.target.value)}> ID3 - Georgia Tech - Machine Learning </button>
-                        <button value="mpU84OJ5vdQ" onClick={(e) => ChangeVideoEvent(e.target.value)}> KNN - Georgia Tech - Machine Learning </button>
+                        {Object.entries(video_list_json).map(([videoId, videoTitle]) => (
+                            <button
+                                key={videoId}
+                                value={videoId}
+                                onClick={(e) => ChangeVideoEvent(e.target.value)}
+                            >
+                                {videoTitle}
+                            </button>
+                        ))}
                     </div>
-
-                    {/* <div className="left-section-lower-part">
-                        <div className='left-section-icons'>
-                            <span className='material-symbols-rounded left-section-icon-size'> Settings </span> Settings
-                        </div>
-                        <div className='left-section-icons'>
-                            <span className='material-symbols-rounded left-section-icon-size'> Logout </span> Logout
-                        </div>
-                    </div> */}
                 </div>
             )}
         </div>
     );
 };
 
-// Middle section component
-
-
-// Right section component
-
-
-// Parent component to manage left section visibility
 function App() {
     /// Query to GPT Model
     const [input, setinput] = useState("");
@@ -389,14 +372,28 @@ function App() {
     const ChangeVideoEvent = (id) => {
         setVideoId(id);
         setIsWelcompageDisplayed(true)
-
     };
+
+    const RefreshVideoSelection = async () => {
+        // console.log("aaaaa")
+
+        await fetch(`http://127.0.0.1:8000/RefreshVideoSelection/`)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    video_list_string = result.data
+                },
+                (error) => {
+                    setError(error);
+                }
+            )
+    }
 
     return (
         <div className="app">
             <div className="burger-menu" onClick={toggleLeft}>
                 {/* &#9776; */}
-                <LeftSection className='burger-menu-opened' isOpen={isLeftOpen} ChangeVideoEvent={ChangeVideoEvent} />
+                <LeftSection className='burger-menu-opened' isOpen={isLeftOpen} ChangeVideoEvent={ChangeVideoEvent} RefreshVideoSelection={RefreshVideoSelection} />
             </div>
 
             <div className="middle-section">

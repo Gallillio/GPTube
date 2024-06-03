@@ -2,8 +2,7 @@
 All side urls are kept here
 """
 from django.urls import path
-from .views import base, GetChatbotResponseAjax, GetTimeAndID, GetQuizAnswers, GetGenerateQuizJson, ChangeVideoID
-from django.urls import URLPattern
+from .views import base, GetChatbotResponseAjax, GetTimeAndID, GetQuizAnswers, GetGenerateQuizJson, RefreshVideoSelection
 
 urlpatterns = [
     path('', base, name='base'),
@@ -11,7 +10,5 @@ urlpatterns = [
     path('GetTimeAndID/', GetTimeAndID, name='GetTimeAndID'),
     path('GetQuizAnswers/', GetQuizAnswers, name='GetQuizAnswers'),
     path('GetGenerateQuizJson/', GetGenerateQuizJson, name='GetGenerateQuizJson'),
-    path('ChangeVideoID/', ChangeVideoID, name='ChangeVideoID'),
-
-
+    path('RefreshVideoSelection/', RefreshVideoSelection, name='RefreshVideoSelection'),
 ]

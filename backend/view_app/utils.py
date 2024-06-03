@@ -11,20 +11,16 @@ import pandas as pd
 import os
 import faiss
 from dotenv import load_dotenv, find_dotenv
-from datetime import date, datetime
 from langchain.chat_models import AzureChatOpenAI
 from langchain_openai import AzureOpenAIEmbeddings
 from sentence_transformers import SentenceTransformer
 from langchain.docstore import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
-from langchain.agents import initialize_agent, load_tools, AgentType, Tool, AgentExecutor, Tool, ZeroShotAgent, create_structured_chat_agent
-from langchain.memory import ConversationBufferMemory, VectorStoreRetrieverMemory, ConversationSummaryBufferMemory
-from langchain.chains import ConversationChain, LLMChain
+from langchain.memory import VectorStoreRetrieverMemory, ConversationSummaryBufferMemory
+from langchain.chains import LLMChain
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
-from langchain.prompts import MessagesPlaceholder
-from langchain.tools import BaseTool
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
@@ -306,3 +302,9 @@ def QuizAsContext(input,stopped_time):
             return conversation.predict(input = input , stopped_time = stopped_time , given_data = video_data) 
         else:
             return conversation.predict(input = input ,stopped_time = stopped_time  , given_data = video_data)
+
+def RefreshVideoList():
+    df = pd.read_csv("video_data/reformatted_transcript.csv")
+    video_dict = df[['video_id', 'video_name']].drop_duplicates().set_index('video_id').to_dict()['video_name']
+
+    return video_dict

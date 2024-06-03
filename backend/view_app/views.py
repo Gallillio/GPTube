@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
-from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson, RoutingResponse,QuizAsContext
+from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson, RoutingResponse, QuizAsContext, RefreshVideoList
 from django.http import JsonResponse
 from django.core.cache import cache
 import json
@@ -139,15 +139,13 @@ def GetQuizAnswers(request):
 
         return JsonResponse({"quiz_scenario_user_answers_response": gpt_response})
 
-def ChangeVideoID(request):
+def RefreshVideoSelection(request):
     if request.method == 'GET':
-        video_id = request.GET.get('videoId')
-        
-        print("\n\n\n\n")
-        print(video_id)
-        print("\n\n\n\n")
+        video_ids_dict = RefreshVideoList()
+        video_ids_json = json.dumps(video_ids_dict)
 
-        return JsonResponse({"videoIdChangedSucessful": True})
+        
+        return JsonResponse({"data": video_ids_json})
 
 # time_and_id_response = GetTimeAndID(HttpResponse("<h2> go to /GetChatbotResponseAjax/"))
 # stopped_time = time_and_id_response.get('Stopped_Time', stopped_time)
