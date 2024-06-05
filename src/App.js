@@ -40,7 +40,7 @@ const LeftSection = ({ isOpen, isLeftOpen, ChangeVideoEvent, RefreshVideoSelecti
 
                     <div>
                         {Object.entries(video_list_json).map(([videoId, videoTitle]) => (
-                            <button
+                            <button className='video_button'
                                 key={videoId}
                                 value={videoId}
                                 onClick={(e) => ChangeVideoEvent(e.target.value)}
