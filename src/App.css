@@ -285,10 +285,10 @@ textarea {
 
 .send{
     border: none;
-    padding: 10px;
+    padding: 7px;
     cursor: pointer;
     background-color: transparent;
-    z-index: 1;
+    /* z-index: 1; */
 }
 
 .video-div {
@@ -305,12 +305,13 @@ textarea {
     background-color: var(--icon-hover-bg);
     border-radius: 50%;
 }
+
 #chat-input{
     position: absolute;
     bottom:0;
     left: 0;
     overflow-y: hidden;
-    
+    /* width: 13em;     */
 }
 
 .burger-menu-opened
