@@ -19,24 +19,26 @@ const LeftSection = ({ isOpen, isLeftOpen, ChangeVideoEvent, RefreshVideoSelecti
 
     return (
         <div className={`left-section ${isOpen ? 'open' : ''}`}>
-            {!isLeftOpen ? <button className='send material-symbols-rounded hover burger-menu'> menu </button>
-                :
-                <button className='send material-symbols-rounded burger-menu-opened'>menu_open</button>}
+            {!isLeftOpen ?
+                <button className='send material-symbols-rounded hover burger-menu'>menu</button> :
+                <button className='send material-symbols-rounded burger-menu-opened'>menu_open</button>
+            }
 
             {isOpen && ( // Conditionally render content only when isOpen is true
                 <div className='left-section select-video-section'>
-                    <div className="left-section-top-part">
+                    {/* <div className="left-section-top-part">
                         <img src={userProfilePicture} alt='user profile' className='user-profile-picture' />
                     </div>
-                    El King <br />
-
-                    <button onClick={RefreshVideoSelection}>Refresh Video List</button>
-
-                    <br />
-                    <br />
-                    <hr />
-
-                    <b> Select your video </b>
+                    El King <br /> */}
+                    <hr /><br />
+                    <b>Select your video</b>
+                    <br /><br />
+                    <hr /><br />
+                    <b> Or </b>
+                    <br /><br />
+                    <button onClick={RefreshVideoSelection} className='video_button'>Refresh Video List</button>
+                    <br /><br />
+                    <hr /><br />
 
                     <div>
                         {Object.entries(video_list_json).map(([videoId, videoTitle]) => (
