@@ -2,12 +2,21 @@
 
 GPTube is an interactive web application that allows users to engage with video content in a dynamic way. The application leverages AI to generate quizzes, create PowerPoint presentations, and answer questions based on the video being watched. Users can input their own YouTube videos and customize the content by providing a transcript.
 
+![Main Example](Results%20Pictures/main.png)
+
 ## Features
 
 - **Generate Quizzes**: Users can ask the application to create quizzes based on the content of the video. The quizzes are generated dynamically and can be tailored to the specific video being watched.
+
+  ![Quiz Example](Results%20Pictures/quiz.png)
+
 - **Create PowerPoint Presentations**: Users can request PowerPoint presentations that summarize the key points from the video. The application generates slides with titles, bullet points, and notes.
 
+  ![PowerPoint Example](Results%20Pictures/powerpoint.png)
+
 - **Interactive Q&A**: Users can ask questions about the video content, and the application will provide answers based on the transcript and context of the video.
+
+  ![Question Example](Results%20Pictures/question.png)
 
 - **Custom Video Input**: Users can input their own YouTube videos that are not included in the provided content list by adding the video transcript to the `reformatted_transcript.csv` file.
 
