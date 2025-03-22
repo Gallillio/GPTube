@@ -3,69 +3,82 @@ This file is for any helper functions that
 calculate or do a specific thing that dont necessirly 
 handle any HTTP requests or anything related to views
 """
-#imports
-#imports
-import openai
+import google.generativeai as genai
 import json
 import pandas as pd
 import os
 import faiss
 from dotenv import load_dotenv, find_dotenv
-from langchain.chat_models import AzureChatOpenAI
-from langchain_openai import AzureOpenAIEmbeddings
 from sentence_transformers import SentenceTransformer
-from langchain.docstore import InMemoryDocstore
+from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.memory import VectorStoreRetrieverMemory, ConversationSummaryBufferMemory
 from langchain.chains import LLMChain
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
+import aiohttp
+import asyncio
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 conversation = None
 
-"""
-if use scenario: use_scenario = True
-if use chatbot: use_scenario = False
-"""
+# Configure Gemini API
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_URL = os.getenv("GEMINI_URL")
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel('gemini-2.0-flash')
 
-def ConnectToAzure():
+async def get_gemini_response(prompt: str) -> str:
+    """
+    Get a response from Gemini API with retry logic and proper error handling
+    """
+    payload = {
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }]
+    }
+    
+    headers = {
+        "Content-Type": "application/json"
+    }
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            GEMINI_URL,
+            headers=headers,
+            json=payload,
+            params={"key": GEMINI_API_KEY}
+        ) as response:
+            if response.status == 503:
+                print("Server is busy, retrying in 15 seconds...")
+                await asyncio.sleep(15)
+                return await get_gemini_response(prompt)
+            if response.status != 200:
+                error_text = await response.text()
+                raise Exception(f"Error: {response.status} - {error_text}")
+            result = await response.json()
+            candidate = result["candidates"][0]
+            return candidate.get("content", {}).get("parts", [{}])[0].get("text", "")
+
+def run_async(coro):
+    """Helper function to run async code in synchronous context"""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(coro)
+    loop.close()
+    return result
+
+def ConnectToGemini():
     """
     desc:
-        Function connects to langchain AzureOpenAI
+        Function connects to Google Gemini API
     return: 
         model of llm
     """
-    ## Keys ##
-    OPENAI_API_TYPE = os.getenv("OPENAI_API_TYPE")
-    OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
-    OPENAI_API_VERSION = os.getenv("OPENAI_API_VERSION")
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    DEPLOYMENT_NAME = os.getenv("DEPLOYMENT_NAME")
-
-    model = AzureChatOpenAI(
-        openai_api_base=OPENAI_API_BASE,
-        openai_api_version=OPENAI_API_VERSION,
-        azure_deployment=DEPLOYMENT_NAME,
-        openai_api_key=OPENAI_API_KEY,
-        openai_api_type=OPENAI_API_TYPE,
-    )
     return model
-
-def ConnectToAzureEmbedding():
-    OPENAI_API_TYPE = os.getenv("OPENAI_API_TYPE")
-    OPENAI_API_VERSION = os.getenv("OPENAI_API_VERSION")
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    OPENAI_API_DEPLOYMENT_URL = os.getenv("OPENAI_API_DEPLOYMENT_URL")
-
-    return AzureOpenAIEmbeddings(
-    openai_api_base=OPENAI_API_DEPLOYMENT_URL,
-    openai_api_version=OPENAI_API_VERSION,
-    openai_api_key=OPENAI_API_KEY,
-    openai_api_type=OPENAI_API_TYPE,
-)
 
 def ConnectToE5Embedding():
     return SentenceTransformer("intfloat/multilingual-e5-base")
@@ -83,17 +96,18 @@ def RagWithFaiss(question, context):
     return context
 
 def MemoryWithVectorStore():
-    embeddings = ConnectToAzureEmbedding()
-    embedding_size = 1536 # Dimensions of the OpenAIEmbeddings
+    embeddings = ConnectToE5Embedding()
+    embedding_size = 768  # Dimensions of the E5 embeddings
     index = faiss.IndexFlatL2(embedding_size)
-    embedding_fn = embeddings.embed_query
+    embedding_fn = embeddings.encode
     vectorstore = FAISS(embedding_fn, index, InMemoryDocstore({}), {})
     retriever = vectorstore.as_retriever(search_kwargs=dict(k=4))
     return VectorStoreRetrieverMemory(retriever=retriever)
 
 def SummarizationMemory():
-    model = ConnectToAzure()
-    return ConversationSummaryBufferMemory(llm=model, max_token_limit=1000, memory_key="history",  input_key='input')
+    # Create a LangChain-compatible LLM
+    langchain_model = ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=GEMINI_API_KEY)
+    return ConversationSummaryBufferMemory(llm=langchain_model, max_token_limit=1000, memory_key="history", input_key='input')
 
 def ConversationChainWithMemory(video_data, stopped_time):
     _DEFAULT_TEMPLATE = """
@@ -116,7 +130,7 @@ def ConversationChainWithMemory(video_data, stopped_time):
     is he asking about, so you should respond here with knowing the text that he stopped at and all the previous texts from the transcript
     the transcript and the stopped time are given above so don't ask the user about them.
     After all of these you should be able to respond to any question related to the video so don't tell the user 
-     'Could you please let me know the specific part of the video you would like to be tested on?'.
+    'Could you please let me know the specific part of the video you would like to be tested on?'.
     
     History of the conversation:
     {history}
@@ -129,11 +143,14 @@ def ConversationChainWithMemory(video_data, stopped_time):
         input_variables=["history", "input", "stopped_time", 'given_data'], template=_DEFAULT_TEMPLATE
     )
 
+    # Create a LangChain-compatible LLM
+    langchain_model = ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=GEMINI_API_KEY)
+    
     conversation = LLMChain(
-    llm=ConnectToAzure(),
-    prompt=prompt,
-    verbose=True,
-    memory=SummarizationMemory(),
+        llm=langchain_model,
+        prompt=prompt,
+        verbose=True,
+        memory=SummarizationMemory(),
     )
     return conversation
 
@@ -230,14 +247,20 @@ def GenerateQuizJson(video_id, csv_file, input):
     User question: {input}
     """
     video_data = get_video_data_txt(csv_file, video_id)
-    prompt = ChatPromptTemplate.from_template(template=quiz_template)
-    messages = prompt.format_messages(text=video_data, 
-                                format_instructions=format_instructions,
-                                input = input)
-    chat = ConnectToAzure()
-    quiz = chat(messages)
+    
+    # Create the prompt as a single string instead of LangChain messages
+    formatted_prompt = quiz_template.format(
+        text=video_data, 
+        format_instructions=format_instructions,
+        input=input
+    )
+    
+    # Use Google's Gemini API directly
+    chat = ConnectToGemini()
+    quiz = chat.generate_content(formatted_prompt)
+    
     parser = JsonOutputParser()
-    quiz_dict = parser.parse(quiz.content)
+    quiz_dict = parser.parse(quiz.text)
     file_name = "./../src/quiz_scenario_JSON.json"
     
     with open(file_name, 'w') as json_file:
@@ -247,15 +270,14 @@ def GenerateQuizJson(video_id, csv_file, input):
         json.dump(quiz_dict, json_file)
     return quiz_dict
 
-def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
+def GetChatboxResponse(user_input, video_id, stopped_time):
     """
-    Takes user_query and returns chatgpt response
+    Takes user_query and returns Gemini response
     use_scenario = False because text here will be displayed in chatbot
     parameter:
         user_input: query user enters
     """
     if user_input and video_id and stopped_time:
-
         use_scenario = False
         global conversation
         csv_file = "video_data/reformatted_transcript.csv"
@@ -269,28 +291,19 @@ def GetChatboxResponse(user_input, video_id, stopped_time): #user_input = query
             return conversation.predict(input = user_input, stopped_time = stopped_time, given_data = context), use_scenario
 
 def RoutingResponse(user_input):
-    chain = (
-    ChatPromptTemplate.from_template(
-        """Given the user prompt, it can be classified in 3 ways: `Default`, `Quiz` `pp`.
-        I'll provide a description for each classification and you have to decide depending on the user prompt which class is most appropriate.
-        Descriptions:
-        - `Default`: used when user prompt is a question related to the video OR if the user question is a question ABOUT a quiz that they did, for example something along the lines of 'explain a question 2' or 'explain why answer B in question 3 is wrong'.
-        - `Quiz`: used when the user prompt is for the AI to quiz him, this should ONLY be done when the user asks to be tested.
-        - `pp`: used when the user prompt is for the AI to make a powerpoint presentation for him, ONLY use it in that case.
-
-Do not respond with more than one word.
-
-<question>
-{question}
-</question>
-
-Classification:"""
-    )
-  )   
-    chain = chain.invoke({"question": user_input}) 
-    chat = ConnectToAzure()
-    response = chat(chain.messages).content.lower()
-    return response
+    # Simple keyword-based classification to avoid model confusion
+    user_input_lower = user_input.lower()
+    
+    # Check for quiz-related keywords
+    if any(keyword in user_input_lower for keyword in ["quiz", "test me", "test my knowledge", "generate questions", "create a quiz"]):
+        return "Quiz"
+    
+    # Check for powerpoint-related keywords
+    if any(keyword in user_input_lower for keyword in ["powerpoint", "presentation", "slides", "ppt", "make a presentation"]):
+        return "pp"
+    
+    # Default case for regular questions
+    return "Default"
 
 def QuizAsContext(input,stopped_time):
         video_data = input
@@ -308,3 +321,114 @@ def RefreshVideoList():
     video_dict = df[['video_id', 'video_name']].drop_duplicates().set_index('video_id').to_dict()['video_name']
 
     return video_dict
+
+def GeneratePowerPointJson(video_id, csv_file, input):
+    """
+    Generate PowerPoint slides in JSON format based on video transcript
+    """
+    ppt_template = """\
+    From the transcript, create an educational PowerPoint presentation. Generate between 5-8 slides including:
+    - A title slide
+    - Content slides with key points from the transcript
+    - A summary slide
+    
+    The output should be formatted as the following JSON schema:
+    [
+      {{
+        "title": "Introduction to Machine Learning",
+        "content": [
+          "Machine learning is a branch of artificial intelligence",
+          "It enables computers to learn without explicit programming",
+          "Growing field with many real-world applications"
+        ],
+        "note": "Optional presenter notes about this slide"
+      }},
+      {{
+        "title": "Types of Machine Learning",
+        "content": [
+          "Supervised Learning: Training with labeled data",
+          "Unsupervised Learning: Finding patterns in unlabeled data",
+          "Reinforcement Learning: Learning through trial and error"
+        ],
+        "note": "Briefly explain each type with examples if time permits"
+      }}
+    ]
+    
+    Ensure the slides are educational, concise, and capture the main concepts from the transcript.
+    Each slide should have a clear title and 2-5 bullet points as content.
+    Create slides that flow logically from introduction to conclusion.
+
+    transcript: {text}
+
+    User request: {input}
+    """
+    
+    video_data = get_video_data_txt(csv_file, video_id)
+    
+    # Create the prompt as a single string
+    formatted_prompt = ppt_template.format(
+        text=video_data,
+        input=input
+    )
+    
+    # Use Google's Gemini API directly
+    chat = ConnectToGemini()
+    presentation = chat.generate_content(formatted_prompt)
+    
+    try:
+        # Parse the JSON response
+        parser = JsonOutputParser()
+        slides_dict = parser.parse(presentation.text)
+        
+        # Save to files
+        file_name = "./../src/powerpoint_scenario_JSON.json"
+        with open(file_name, 'w') as json_file:
+            json.dump(slides_dict, json_file)
+            
+        file_name_back = "./powerpoint_scenario_JSON.json"
+        with open(file_name_back, 'w') as json_file:
+            json.dump(slides_dict, json_file)
+            
+        return slides_dict
+    except Exception as e:
+        print(f"Error parsing presentation: {e}")
+        # If JSON parsing fails, attempt to extract JSON from the text response
+        import re
+        json_match = re.search(r'\[\s*\{.*\}\s*\]', presentation.text, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(0)
+            slides_dict = json.loads(json_str)
+            
+            # Save to files
+            file_name = "./../src/powerpoint_scenario_JSON.json"
+            with open(file_name, 'w') as json_file:
+                json.dump(slides_dict, json_file)
+                
+            file_name_back = "./powerpoint_scenario_JSON.json"
+            with open(file_name_back, 'w') as json_file:
+                json.dump(slides_dict, json_file)
+                
+            return slides_dict
+        else:
+            # If all parsing fails, return a default presentation
+            default_slides = [
+                {
+                    "title": "Error Creating Presentation",
+                    "content": [
+                        "Could not generate presentation from transcript",
+                        "Please try again with different phrasing"
+                    ],
+                    "note": "Error occurred during presentation generation"
+                }
+            ]
+            
+            # Save default slides
+            file_name = "./../src/powerpoint_scenario_JSON.json"
+            with open(file_name, 'w') as json_file:
+                json.dump(default_slides, json_file)
+                
+            file_name_back = "./powerpoint_scenario_JSON.json"
+            with open(file_name_back, 'w') as json_file:
+                json.dump(default_slides, json_file)
+                
+            return default_slides

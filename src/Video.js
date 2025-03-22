@@ -6,21 +6,50 @@ class Video extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      stoppedTime: null
+      stoppedTime: null,
+      loadedVideoId: null
     };
     this._onPause = this._onPause.bind(this);
+    this._onReady = this._onReady.bind(this);
+    this._onError = this._onError.bind(this);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.videoId !== this.props.videoId) {
+      console.log(`Video component received new videoId: ${this.props.videoId}`);
+    }
+  }
+
+  _onReady(event) {
+    // Log when the video is ready
+    try {
+      const videoData = event.target.getVideoData();
+      console.log("Video ready:", videoData);
+      this.setState({ loadedVideoId: videoData.video_id });
+    } catch (error) {
+      console.error("Error in onReady:", error);
+    }
+  }
+
+  _onError(event) {
+    // Log any errors that occur
+    console.error("YouTube player error:", event.data);
   }
 
   _onPause(event) {
     // When the video is paused, update the stoppedTime state with the current time
-    const stoppedTime = event.target.getCurrentTime();
-    this.setState({ stoppedTime });
-    // Log the stopped time to the console
-    console.log("Video stopped at:", stoppedTime);
+    try {
+      const stoppedTime = event.target.getCurrentTime();
+      this.setState({ stoppedTime });
+      // Log the stopped time to the console
+      console.log("Video stopped at:", stoppedTime);
 
-    // Send stopped time and video ID to backend
-    const videoId = event.target.getVideoData().video_id;
-    this.sendStoppedTimeToBackend(stoppedTime, videoId);
+      // Send stopped time and video ID to backend
+      const videoId = event.target.getVideoData().video_id;
+      this.sendStoppedTimeToBackend(stoppedTime, videoId);
+    } catch (error) {
+      console.error("Error in onPause:", error);
+    }
   }
 
   sendStoppedTimeToBackend(stoppedTime, videoId) {
@@ -53,12 +82,23 @@ class Video extends React.Component {
       },
     };
 
+    console.log("Video component rendering with videoId:", this.props.videoId);
+
     return (
       <div>
-        {console.log("id is: " + this.props.videoId)}
-        <YouTube videoId={this.props.videoId} opts={options} onPause={this._onPause} iframeClassName={"video-style"} />
-        {/* You can display the stopped time if needed */}
-        {/* {this.state.stoppedTime && <p>Video stopped at: {this.state.stoppedTime}</p>} */}
+        <YouTube
+          videoId={this.props.videoId}
+          opts={options}
+          onPause={this._onPause}
+          onReady={this._onReady}
+          onError={this._onError}
+          iframeClassName={"video-style"}
+        />
+        {/* Debug info - can be removed in production */}
+        <div style={{ display: 'none' }}>
+          <p>Prop videoId: {this.props.videoId}</p>
+          <p>Loaded videoId: {this.state.loadedVideoId}</p>
+        </div>
       </div>
     );
   }

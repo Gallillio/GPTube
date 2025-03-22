@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
-from .utils import ConnectToAzure, GetChatboxResponse, GenerateQuizJson, RoutingResponse, QuizAsContext, RefreshVideoList
+from .utils import ConnectToGemini, GetChatboxResponse, GenerateQuizJson, GeneratePowerPointJson, RoutingResponse, QuizAsContext, RefreshVideoList
 from django.http import JsonResponse
 from django.core.cache import cache
 import json
@@ -10,26 +10,24 @@ def base(request):
     return HttpResponse("<h2> go to /GetChatbotResponseAjax/")
 
 def GetChatbotResponseAjax(request):
-    # Connect to Azure OpenAI 
-    ConnectToAzure()
+    # Connect to Gemini
+    ConnectToGemini()
     
     if request.method == 'GET':
         query = request.GET.get('query')
         videoId = request.GET.get('videoId')
         stopped_time = None
         response = RoutingResponse(query)
-        # print(response, "\n ======================================")
+        
         # quiz scenario
-        if "quiz" in response.lower():
+        if response == "Quiz":
             print("\n\n", "Quiz Scenario", "\n\n")
             GetGenerateQuizJson(request, query)
-
             gpt_response = "Quiz has been generated in the Scenario Section"
             use_scenario = True
-        elif "pp" in response.lower():
+        elif response == "pp":
             print("\n\n", "Presentation Scenario", "\n\n")
-            # GetGenerateQuizJson(request, query)
-
+            GetGeneratePowerPointJson(request, query)
             gpt_response = "Presentation has been generated in the Scenario Section"
             use_scenario = True
         # normal message
@@ -45,15 +43,14 @@ def GetChatbotResponseAjax(request):
             except Exception as e:
                 return JsonResponse({"gpt_response": "Error occurred: " + str(e)}, status=500)
 
-            # print("Stopped Time wohooo:", stopped_time)
-        
             gpt_response, use_scenario = GetChatboxResponse(query, videoId, stopped_time)
-            # print("\n\n\n\n\n gpt_response: \n", gpt_response, "\n\n\n\n\n")
 
         if gpt_response:
             return JsonResponse({"gpt_response": gpt_response, "use_scenario": use_scenario, "videoId": videoId})
         else:
             return JsonResponse({"gpt_response": "Method not allowed"}, status=405)
+    else:
+        return JsonResponse({"gpt_response": "Method not allowed"}, status=405)
 
 def GetTimeAndID(request):
     if request.method == 'GET':
@@ -89,9 +86,15 @@ def GetGenerateQuizJson(request, input):
     if request.method == 'GET':
         video_id = request.GET.get('videoId')
         Quiz = GenerateQuizJson(video_id, csv_file, input)
-        # print("Quiz: \n", Quiz)
         return JsonResponse({"quiz": Quiz})
-    
+
+def GetGeneratePowerPointJson(request, input):
+    csv_file = "video_data/reformatted_transcript.csv"
+    if request.method == 'GET':
+        video_id = request.GET.get('videoId')
+        slides = GeneratePowerPointJson(video_id, csv_file, input)
+        return JsonResponse({"slides": slides})
+
 def GetQuizAnswers(request):
     if request.method == 'GET':
     # To get the correct answers
