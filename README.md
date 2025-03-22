@@ -1,70 +1,80 @@
-# Getting Started with Create React App
+# GPTube
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+GPTube is an interactive web application that allows users to engage with video content in a dynamic way. The application leverages AI to generate quizzes, create PowerPoint presentations, and answer questions based on the video being watched. Users can input their own YouTube videos and customize the content by providing a transcript.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Generate Quizzes**: Users can ask the application to create quizzes based on the content of the video. The quizzes are generated dynamically and can be tailored to the specific video being watched.
+- **Create PowerPoint Presentations**: Users can request PowerPoint presentations that summarize the key points from the video. The application generates slides with titles, bullet points, and notes.
 
-### `npm start`
+- **Interactive Q&A**: Users can ask questions about the video content, and the application will provide answers based on the transcript and context of the video.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Custom Video Input**: Users can input their own YouTube videos that are not included in the provided content list by adding the video transcript to the `reformatted_transcript.csv` file.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Setup Instructions
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js and npm installed on your machine.
+- An OpenAI API key and endpoint for the application to function properly.
+- An Azure endpoint for speech services.
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the repository:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   ```bash
+   git clone https://github.com/yourusername/GPTube.git
+   cd GPTube
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Install the dependencies:
 
-### `npm run eject`
+   ```bash
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Create a `.env` file in the root directory and add your OpenAI API key and Azure endpoint:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+   ```plaintext
+   REACT_APP_SPEECH_KEY=your_azure_speech_key
+   REACT_APP_SPEECH_REGION=your_azure_speech_region
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+   **Note**: The `.env` file is kept public on purpose for easier use, but all keys and endpoints have been deleted. If you try to use it without adding your own keys, it will not work.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+4. For the **Master branch**, you will need to input your own OpenAI API key and Azure endpoint for the app to work.
 
-## Learn More
+5. Alternatively, you can switch to the **Use-Gemini** branch for free use by utilizing your own Gemini API. Gemini is free to use, but please note that this branch is more buggy as it was created on 22/3/2025 after the project was considered complete. I only did it for anyone who wants to try it for free and did not want to spend too much time on it. I will integrate it properly in the future if I have the time.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   ```bash
+   git checkout Use-Gemini
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+6. Start the application:
+   ```bash
+   npm start
+   ```
 
-### Code Splitting
+## Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Open the application in your web browser.
+- Select a video from the list or input your own YouTube video.
+- Interact with the chatbot to generate quizzes, create PowerPoint presentations, or ask questions about the video content.
 
-### Analyzing the Bundle Size
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Contributions are welcome! If you have suggestions for improvements or new features, please open an issue or submit a pull request.
 
-### Making a Progressive Web App
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Advanced Configuration
+## Acknowledgments
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- Thanks to OpenAI for providing the API that powers the chatbot functionality.
+- Thanks to Microsoft Azure for the speech services that enhance the user experience.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Feel free to customize this README further to fit your project's specific needs!
