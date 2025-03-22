@@ -33,7 +33,7 @@ GPTube is an interactive web application that allows users to engage with video 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/GPTube.git
+   git clone https://github.com/Gallillio/GPTube.git
    cd GPTube
    ```
 
