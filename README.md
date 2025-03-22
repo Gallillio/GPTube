@@ -81,6 +81,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
+- To all the video's I've used to showcase this tool.
 - Thanks to OpenAI for providing the API that powers the chatbot functionality.
 - Thanks to Microsoft Azure for the speech services that enhance the user experience.
 
