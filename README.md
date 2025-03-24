@@ -86,5 +86,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Thanks to Microsoft Azure for the speech services that enhance the user experience.
 
 ---
-
-Feel free to customize this README further to fit your project's specific needs!
