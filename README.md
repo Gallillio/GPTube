@@ -50,8 +50,6 @@ GPTube is an interactive web application that allows users to engage with video 
    REACT_APP_SPEECH_REGION=your_azure_speech_region
    ```
 
-   **Note**: The `.env` file is kept public on purpose for easier use, but all keys and endpoints have been deleted. If you try to use it without adding your own keys, it will not work.
-
 4. For the **Master branch**, you will need to input your own OpenAI API key and Azure endpoint for the app to work.
 
 5. Alternatively, you can switch to the **Use-Gemini** branch for free use by utilizing your own Gemini API. Gemini is free to use, but please note that this branch is more buggy as it was created on 22/3/2025 after the project was considered complete. I only did it for anyone who wants to try it for free and did not want to spend too much time on it. I will integrate it properly in the future if I have the time.
